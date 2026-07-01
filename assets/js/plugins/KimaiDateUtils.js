@@ -306,4 +306,111 @@ export default class KimaiDateUtils extends KimaiPlugin {
         return luxonDuration;
     }
 
+    /**
+     * @returns {number}
+     */
+    getTimesheetTimeIncrement()
+    {
+        const increment = this.getConfiguration('timesheetTimeIncrement');
+
+        return increment ? parseInt(increment, 10) : 0;
+    }
+
+    /**
+     * @returns {number}
+     */
+    getTimesheetDurationIncrement()
+    {
+        const increment = this.getConfiguration('timesheetDurationIncrement');
+
+        return increment ? parseInt(increment, 10) : 0;
+    }
+
+    /**
+     * @param {number} minutes
+     * @param {number} increment
+     * @returns {number}
+     */
+    roundMinutesToIncrement(minutes, increment)
+    {
+        if (!increment || increment <= 0) {
+            return minutes;
+        }
+
+        return Math.round(minutes / increment) * increment;
+    }
+
+    /**
+     * @param {number} seconds
+     * @param {number} increment
+     * @returns {number}
+     */
+    roundSecondsToIncrement(seconds, increment)
+    {
+        if (!increment || increment <= 0) {
+            return seconds;
+        }
+
+        const incrementSeconds = increment * 60;
+
+        return Math.round(seconds / incrementSeconds) * incrementSeconds;
+    }
+
+    /**
+     * @param {string} time
+     * @param {number} increment
+     * @returns {string}
+     */
+    snapClockTimeString(time, increment)
+    {
+        if (!increment || increment <= 0 || time === '') {
+            return time;
+        }
+
+        let formatted = time.trim();
+        let suffix = '';
+        const ampmMatch = formatted.match(/\s*(AM|PM)$/i);
+
+        if (ampmMatch) {
+            suffix = ' ' + ampmMatch[1].toUpperCase();
+            formatted = formatted.replace(/\s*(AM|PM)$/i, '').trim();
+        }
+
+        const match = formatted.match(/^(\d+):(\d+)/);
+        if (match === null) {
+            return time;
+        }
+
+        let hours = parseInt(match[1], 10);
+        let minutes = this.roundMinutesToIncrement(parseInt(match[2], 10), increment);
+
+        if (minutes === 60) {
+            minutes = 0;
+            hours = (hours + 1) % 24;
+        }
+
+        return hours + ':' + minutes.toString().padStart(2, '0') + suffix;
+    }
+
+    /**
+     * @param {string} duration
+     * @param {number} increment
+     * @returns {string}
+     */
+    snapDurationString(duration, increment)
+    {
+        if (!increment || increment <= 0 || duration === '') {
+            return duration;
+        }
+
+        const parsed = this.parseDuration(duration);
+        if (!parsed.isValid) {
+            return duration;
+        }
+
+        const rounded = this.roundSecondsToIncrement(parsed.as('seconds'), increment);
+
+        return this.formatSeconds(rounded);
+    }
+
 }

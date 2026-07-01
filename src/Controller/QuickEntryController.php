@@ -336,7 +336,7 @@ final class QuickEntryController extends AbstractController
         ]);
     }
 
-    private function isWeekLocked(User $user, \DateTimeInterface $endWeek, DateTimeFactory $factory): bool
+    private function isWeekLocked(\App\Entity\User $user, \DateTimeInterface $endWeek, DateTimeFactory $factory): bool
     {
         if ($this->workingTimeService->isApproved($user, $endWeek)) {
             return true;

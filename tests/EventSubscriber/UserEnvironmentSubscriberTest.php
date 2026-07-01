@@ -10,6 +10,7 @@
 namespace App\Tests\EventSubscriber;
 
 use App\Configuration\LocaleService;
+use App\Configuration\SystemConfiguration;
 use App\Entity\User;
 use App\EventSubscriber\UserEnvironmentSubscriber;
 use App\Twig\LocaleFormatExtensions;
@@ -118,12 +119,16 @@ class UserEnvironmentSubscriberTest extends TestCase
 
     private function createLocaleFormatExtensions(): LocaleFormatExtensions
     {
+        $configuration = $this->createMock(SystemConfiguration::class);
+        $configuration->method('getTimesheetIncrementMinutes')->willReturn(30);
+        $configuration->method('getTimesheetIncrementDuration')->willReturn(30);
+
         return new LocaleFormatExtensions(new LocaleService([
             'de' => LocaleService::DEFAULT_SETTINGS,
             'en' => LocaleService::DEFAULT_SETTINGS,
             'fr' => LocaleService::DEFAULT_SETTINGS,
             'it' => LocaleService::DEFAULT_SETTINGS,
-        ]));
+        ]), $configuration);
     }
 
     private function createRequestEvent(string $locale, bool $mainRequest): RequestEvent

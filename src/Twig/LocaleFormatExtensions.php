@@ -10,6 +10,7 @@
 namespace App\Twig;
 
 use App\Configuration\LocaleService;
+use App\Configuration\SystemConfiguration;
 use App\Constants;
 use App\Entity\Timesheet;
 use App\Entity\User;
@@ -30,8 +31,10 @@ final class LocaleFormatExtensions extends AbstractExtension implements LocaleAw
     private ?LocaleFormatter $formatter = null;
     private ?string $locale = null;
 
-    public function __construct(private readonly LocaleService $localeService)
-    {
+    public function __construct(
+        private readonly LocaleService $localeService,
+        private readonly SystemConfiguration $configuration,
+    ) {
     }
 
     public function getFilters(): array
@@ -216,6 +219,8 @@ final class LocaleFormatExtensions extends AbstractExtension implements LocaleAw
             'updateBrowserTitle' => $browserTitle,
             'timezone' => $timezone,
             'user' => ['id' => $id, 'name' => $name, 'admin' => $admin, 'superAdmin' => $superAdmin, 'roles' => $roles],
+            'timesheetTimeIncrement' => $this->configuration->getTimesheetIncrementMinutes(),
+            'timesheetDurationIncrement' => $this->configuration->getTimesheetIncrementDuration(),
         ];
     }
 

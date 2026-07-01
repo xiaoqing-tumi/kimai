@@ -10,6 +10,7 @@
 namespace App\Tests\Twig;
 
 use App\Configuration\LocaleService;
+use App\Configuration\SystemConfiguration;
 use App\Entity\Timesheet;
 use App\Entity\User;
 use App\Twig\LocaleFormatExtensions;
@@ -52,12 +53,13 @@ class LocaleFormatExtensionsTest extends TestCase
     /**
      * @param array<string, array{'date': string, 'time': string, 'rtl': bool, 'translation': bool}> $languageSettings
      */
-    private function getSut(string $locale, array $languageSettings): LocaleFormatExtensions
+    private function getSut(string $locale, array $languageSettings, int $timeIncrement = 30, int $durationIncrement = 30): LocaleFormatExtensions
     {
-        $user = new User();
-        $user->setTimezone('Europe/Vienna');
+        $configuration = $this->createMock(SystemConfiguration::class);
+        $configuration->method('getTimesheetIncrementMinutes')->willReturn($timeIncrement);
+        $configuration->method('getTimesheetIncrementDuration')->willReturn($durationIncrement);
 
-        $sut = new LocaleFormatExtensions(new LocaleService($languageSettings));
+        $sut = new LocaleFormatExtensions(new LocaleService($languageSettings), $configuration);
         $sut->setLocale($locale);
 
         return $sut;
@@ -448,6 +450,8 @@ class LocaleFormatExtensionsTest extends TestCase
                 'superAdmin' => false,
                 'roles' => [],
             ],
+            'timesheetTimeIncrement' => 30,
+            'timesheetDurationIncrement' => 30,
         ];
         $user = $this->createMock(User::class);
         $user->method('getId')->willReturn(1);
@@ -478,9 +482,15 @@ class LocaleFormatExtensionsTest extends TestCase
                 'superAdmin' => false,
                 'roles' => [],
             ],
+            'timesheetTimeIncrement' => 30,
+            'timesheetDurationIncrement' => 30,
         ];
 
-        $sut = new LocaleFormatExtensions(new LocaleService($this->localeEn));
+        $configuration = $this->createMock(SystemConfiguration::class);
+        $configuration->method('getTimesheetIncrementMinutes')->willReturn(30);
+        $configuration->method('getTimesheetIncrementDuration')->willReturn(30);
+
+        $sut = new LocaleFormatExtensions(new LocaleService($this->localeEn), $configuration);
         $sut->setLocale('en');
 
         self::assertEquals($expected, $sut->getJavascriptConfiguration());

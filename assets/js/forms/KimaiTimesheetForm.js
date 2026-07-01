@@ -9,7 +9,7 @@
  * [KIMAI] KimaiEditTimesheetForm: responsible for the most important form in the application
  */
 
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import KimaiFormPlugin from "./KimaiFormPlugin";
 
 export default class KimaiTimesheetForm extends KimaiFormPlugin {
@@ -83,6 +83,10 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
         if (this._break !== undefined && this._break !== null) {
             this._break.removeEventListener('change', this._breakListener);
             delete this._breakListener;
+            if (this._breakBlurListener !== undefined) {
+                this._break.removeEventListener('blur', this._breakBlurListener);
+                delete this._breakBlurListener;
+            }
             delete this._break;
         }
     }
@@ -144,6 +148,8 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
 
         if (this._break !== null) {
             this._break.addEventListener('change', this._breakListener);
+            this._breakBlurListener = () => this._parseBreakDuration();
+            this._break.addEventListener('blur', this._breakBlurListener);
         }
 
         if (this._duration !== null && this._durationToggle !== null) {
@@ -161,6 +167,7 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
         }
 
         let newBeginTime = this._formatTimeForParsing(this._beginTime.value, this._beginTime.dataset['format']);
+        newBeginTime = this.getDateUtils().snapClockTimeString(newBeginTime, this.getDateUtils().getTimesheetTimeIncrement());
         if (newBeginTime !== this._beginTime.value) {
             this._beginTime.value = newBeginTime;
             this._changedBegin();
@@ -174,6 +181,7 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
         }
 
         let newEndTime = this._formatTimeForParsing(this._endTime.value, this._endTime.dataset['format']);
+        newEndTime = this.getDateUtils().snapClockTimeString(newEndTime, this.getDateUtils().getTimesheetTimeIncrement());
         if (newEndTime !== this._endTime.value) {
             this._endTime.value = newEndTime;
             this._changedEnd();
@@ -186,7 +194,32 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
             return;
         }
 
-        this._setDurationAsString(this._getParsedDuration());
+        const increment = this.getDateUtils().getTimesheetDurationIncrement();
+        let duration = this._getParsedDuration();
+
+        if (increment > 0 && duration.isValid) {
+            const rounded = this.getDateUtils().roundSecondsToIncrement(duration.as('seconds'), increment);
+            if (rounded !== duration.as('seconds')) {
+                duration = Duration.fromObject({seconds: rounded});
+            }
+        }
+
+        this._setDurationAsString(duration);
+    }
+
+    _parseBreakDuration()
+    {
+        if (this._break === null || this._break.value === '') {
+            return;
+        }
+
+        const increment = this.getDateUtils().getTimesheetDurationIncrement();
+        const snapped = this.getDateUtils().snapDurationString(this._break.value, increment);
+
+        if (snapped !== this._break.value) {
+            this._break.value = snapped;
+            this._updateDuration();
+        }
     }
 
     /**
@@ -674,6 +707,7 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
         const inHour = cursorPos <= colonPos;
 
         // Helper to clamp values
+        const minuteStep = this.getDateUtils().getTimesheetDurationIncrement() || 5;
         const clamp = (h, m) => {
             let total = h * 60 + m;
             if (total < 0) { total = 0; }
@@ -688,14 +722,14 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
                 if (inHour) {
                     [hours, minutes] = clamp(hours + 1, minutes);
                 } else {
-                    [hours, minutes] = clamp(hours, minutes + 5);
+                    [hours, minutes] = clamp(hours, minutes + minuteStep);
                 }
                 break;
             case 'ArrowDown':
                 if (inHour) {
                     [hours, minutes] = clamp(hours - 1, minutes);
                 } else {
-                    [hours, minutes] = clamp(hours, minutes - 5);
+                    [hours, minutes] = clamp(hours, minutes - minuteStep);
                 }
                 break;
             case 'PageUp':

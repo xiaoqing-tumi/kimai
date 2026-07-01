@@ -58,6 +58,11 @@ services:
         arguments:
             $settings: '%kimai.config%'
 
+    App\Twig\LocaleFormatExtensions:
+        arguments:
+            $localeService: '@App\Configuration\LocaleService'
+            $configuration: '@App\Configuration\SystemConfiguration'
+
     # HTTP client used by mPDF to fetch remote resources (e.g. logos referenced
     # from custom Twig invoice templates). Decorated with NoPrivateNetworkHttpClient
     # so requests to private/loopback/link-local targets are blocked at the

@@ -86,6 +86,7 @@ export default class KimaiQuickEntryForm extends KimaiFormPlugin {
         this._disableLockedForm(form);
         this._ensureDeleteColumn(form);
         this._initDurationDropdowns(form);
+        this._initDurationSnap(form);
         this._recalculateTotals(form);
     }
 
@@ -128,6 +129,7 @@ export default class KimaiQuickEntryForm extends KimaiFormPlugin {
         this._disableLockedForm(form);
         this._ensureDeleteColumn(form);
         this._initDurationDropdowns(form);
+        this._initDurationSnap(form);
         this._recalculateTotals(form);
     }
 
@@ -192,6 +194,35 @@ export default class KimaiQuickEntryForm extends KimaiFormPlugin {
             }
 
             button.disabled = !canRemove;
+        });
+    }
+
+    /**
+     * Snaps manually entered durations to the configured minute increment.
+     *
+     * @param {HTMLFormElement} form
+     * @private
+     */
+    _initDurationSnap(form)
+    {
+        const increment = this.getDateUtils().getTimesheetDurationIncrement();
+        if (increment <= 0) {
+            return;
+        }
+
+        form.querySelectorAll('.duration-input:not([disabled])').forEach((input) => {
+            if (input.dataset.incrementSnap === '1') {
+                return;
+            }
+
+            input.dataset.incrementSnap = '1';
+            input.addEventListener('blur', () => {
+                const snapped = this.getDateUtils().snapDurationString(input.value, increment);
+                if (snapped !== input.value) {
+                    input.value = snapped;
+                    input.dispatchEvent(new Event('change', {bubbles: true}));
+                }
+            });
         });
     }
 
@@ -351,6 +382,7 @@ export default class KimaiQuickEntryForm extends KimaiFormPlugin {
         collectionHolder.dataset.index++;
         this._ensureDeleteColumn(form);
         this._initDurationDropdowns(form);
+        this._initDurationSnap(form);
         this._recalculateTotals(form);
     }
 
