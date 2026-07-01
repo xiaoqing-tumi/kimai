@@ -241,3 +241,5 @@ services:
 
     App\API\ViewHandler:
         arguments: ['@fos_rest.view_handler.default']
+
+    App\Timesheet\Shift\ShiftResolverInterface: '@App\Timesheet\Shift\ShiftResolver'

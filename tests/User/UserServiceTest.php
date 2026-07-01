@@ -71,4 +71,30 @@ class UserServiceTest extends TestCase
         self::assertNull($user->getPreferenceValue('work_start_day', 'foo'));
         self::assertNull($user->getPreferenceValue('work_last_day', 'foo'));
     }
+
+    public function testCreateNewUserMarksWizardsAsSeenWhenWizardIsDisabled(): void
+    {
+        $sut = new UserService(
+            $this->createMock(UserRepository::class),
+            new EventDispatcher(),
+            $this->createMock(ValidatorInterface::class),
+            SystemConfigurationFactory::createStub([
+                'user' => [
+                    'wizard' => false,
+                ],
+                'defaults' => [
+                    'user' => [
+                        'language' => 'zh_CN',
+                    ],
+                ],
+            ]),
+            $this->createMock(UserPasswordHasherInterface::class)
+        );
+
+        $user = $sut->createNewUser();
+
+        self::assertSame('zh_CN', $user->getLocale());
+        self::assertTrue($user->hasSeenWizard('intro'));
+        self::assertTrue($user->hasSeenWizard('profile'));
+    }
 }

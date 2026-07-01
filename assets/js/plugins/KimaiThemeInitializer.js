@@ -11,6 +11,7 @@
 
 import { Tooltip, Offcanvas } from 'bootstrap';
 import KimaiPlugin from '../KimaiPlugin';
+import KimaiPageLoader from '../widgets/KimaiPageLoader';
 
 export default class KimaiThemeInitializer extends KimaiPlugin {
 
@@ -32,33 +33,91 @@ export default class KimaiThemeInitializer extends KimaiPlugin {
 
         this._registerModalAutofocus('#remote_form_modal');
 
+        this.navProgress = document.getElementById('kimai-nav-progress');
+
+        if (this.navProgress === null) {
+            this.navProgress = document.createElement('div');
+            this.navProgress.id = 'kimai-nav-progress';
+            this.navProgress.className = 'kimai-nav-progress';
+            this.navProgress.setAttribute('aria-hidden', 'true');
+            this.navProgress.innerHTML = '<div class="progress progress-sm"><div class="progress-bar progress-bar-indeterminate"></div></div>';
+            document.body.appendChild(this.navProgress);
+        }
+
         this.overlay = null;
+        this.overlayTimeout = null;
 
         // register a global event listener, which displays an overlays upon notification
         document.addEventListener('kimai.reloadContent', (event) => {
-            // do not allow more than one loading screen at a time
-            if (this.overlay !== null) {
-                return;
+            const showOverlay = () => {
+                let container = 'div.page-wrapper';
+                let useLocal = false;
+
+                if (typeof event.detail === 'string') {
+                    container = event.detail;
+                } else if (event.detail !== undefined && event.detail !== null) {
+                    container = event.detail.container ?? container;
+                    useLocal = event.detail.local === true;
+                }
+
+                const containerElement = document.querySelector(container);
+
+                if (containerElement === null) {
+                    return;
+                }
+
+                if (useLocal && container === 'div.page-body') {
+                    this.navProgress?.classList.add('is-visible');
+
+                    return;
+                }
+
+                if (this.overlay !== null) {
+                    return;
+                }
+
+                if (useLocal) {
+                    containerElement.classList.add('is-navigating');
+                }
+
+                const temp = document.createElement('div');
+                temp.innerHTML = '<div class="' + (useLocal ? 'overlay overlay-local' : 'overlay') + '"><div class="progress progress-sm"><div class="progress-bar progress-bar-indeterminate"></div></div></div>';
+                this.overlay = temp.firstElementChild;
+                containerElement.append(this.overlay);
+            };
+
+            if (this.overlayTimeout !== null) {
+                clearTimeout(this.overlayTimeout);
             }
 
-            // at which element we append the loading screen
-            let container = 'div.page-wrapper';
-            if (event.detail !== undefined && event.detail !== null) {
-                container = event.detail;
-            }
-
-            const temp = document.createElement('div');
-            temp.innerHTML = '<div class="overlay"><div class="progress progress-sm"><div class="progress-bar progress-bar-indeterminate"></div></div></div>';
-            this.overlay = temp.firstElementChild;
-            document.querySelector(container).append(this.overlay);
+        // Delay overlay so fast responses never flash a loader
+            this.overlayTimeout = window.setTimeout(() => {
+                showOverlay();
+                this.overlayTimeout = null;
+            }, 80);
         });
 
         // register a global event listener, which hides an overlay upon notification
         document.addEventListener('kimai.reloadedContent', () => {
+            if (this.overlayTimeout !== null) {
+                clearTimeout(this.overlayTimeout);
+                this.overlayTimeout = null;
+            }
+
+            this.navProgress?.classList.remove('is-visible');
+
+            document.querySelectorAll('.page-body.is-navigating').forEach((element) => {
+                element.classList.remove('is-navigating');
+            });
+
             if (this.overlay !== null) {
                 this.overlay.remove();
                 this.overlay = null;
             }
+        });
+
+        document.addEventListener('kimai.reloadPage', () => {
+            KimaiPageLoader.reinitialize();
         });
     }
 

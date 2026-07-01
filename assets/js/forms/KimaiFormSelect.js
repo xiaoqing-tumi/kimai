@@ -49,6 +49,10 @@ export default class KimaiFormSelect extends KimaiFormTomselectPlugin {
      */
     activateSelectPickerByElement(node)
     {
+        if (node.tomselect !== undefined && node.tomselect !== null) {
+            return;
+        }
+
         // TODO cannot update tom-select to >= 2.6.0 due to https://github.com/orchidjs/tom-select/pull/993#issuecomment-4489286080
         let plugins = ['change_listener'];
 

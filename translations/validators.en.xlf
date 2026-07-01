@@ -74,6 +74,10 @@
         <source>Maximum duration of {{ value }} hours exceeded.</source>
         <target>Maximum {{ value }} hours allowed.</target>
       </trans-unit>
+      <trans-unit id="dlm001" resname="The daily limit of {{ value }} hours is exceeded. Current total would be {{ total }}.">
+        <source>The daily limit of {{ value }} hours is exceeded. Current total would be {{ total }}.</source>
+        <target>The daily limit of {{ value }} is exceeded. Current total would be {{ total }}.</target>
+      </trans-unit>
       <trans-unit id="to1Q85W" resname="An activity needs to be selected.">
         <source>An activity needs to be selected.</source>
         <target>An activity needs to be selected.</target>

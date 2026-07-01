@@ -68,7 +68,7 @@ final class UserController extends AbstractController
         $table->setPagination($entries);
         $table->setSearchForm($form);
         $table->setPaginationRoute('admin_user_paginated');
-        $table->setReloadEvents('kimai.userUpdate');
+        $table->setReloadEvents('kimai.userUpdate kimai.userDelete');
 
         $table->addColumn('avatar', ['class' => 'alwaysVisible w-avatar', 'title' => null, 'orderBy' => false]);
         //$table->addColumn('user', ['class' => 'alwaysVisible', 'orderBy' => 'user']);

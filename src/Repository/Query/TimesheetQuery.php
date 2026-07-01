@@ -49,6 +49,10 @@ class TimesheetQuery extends ActivityQuery implements BillableInterface, DateRan
      * @var array<TimesheetQueryHint>
      */
     private array $queryHints = [];
+    /**
+     * @var array<int>
+     */
+    private array $timesheetIds = [];
 
     public function __construct(bool $resetTimes = true)
     {
@@ -252,5 +256,26 @@ class TimesheetQuery extends ActivityQuery implements BillableInterface, DateRan
     public function setModifiedAfter(\DateTimeInterface $modifiedAfter): void
     {
         $this->modifiedAfter = $modifiedAfter;
+    }
+
+    /**
+     * @param array<int> $ids
+     */
+    public function setTimesheetIds(array $ids): void
+    {
+        $this->timesheetIds = array_values(array_unique(array_filter(array_map(static fn ($id) => (int) $id, $ids), static fn (int $id) => $id > 0)));
+    }
+
+    /**
+     * @return array<int>
+     */
+    public function getTimesheetIds(): array
+    {
+        return $this->timesheetIds;
+    }
+
+    public function hasTimesheetIds(): bool
+    {
+        return \count($this->timesheetIds) > 0;
     }
 }

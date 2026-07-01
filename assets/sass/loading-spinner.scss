@@ -15,3 +15,107 @@
     /*background-color: var(--tblr-backdrop-bg);*/
     opacity: $modal-backdrop-opacity;
 }
+
+.page-body {
+    position: relative;
+
+    &.is-navigating {
+        cursor: wait;
+    }
+
+    &.kimai-page-initializing .page-wrapper {
+        visibility: hidden;
+    }
+}
+
+.kimai-nav-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 1050;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    background: transparent;
+
+    &.is-visible {
+        opacity: 1;
+    }
+
+    .progress {
+        height: 3px;
+        border-radius: 0;
+        background: transparent;
+    }
+}
+
+.overlay-local {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    width: auto;
+    z-index: 10;
+    opacity: 1;
+    background: transparent;
+    pointer-events: none;
+
+    .progress {
+        height: 3px;
+        border-radius: 0;
+        background: transparent;
+    }
+}
+
+.kimai-calendar-placeholder {
+    min-height: 80vh;
+    padding: 1rem;
+}
+
+.kimai-calendar-skeleton-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.kimai-calendar-skeleton-pill {
+    display: inline-block;
+    height: 2rem;
+    width: 5rem;
+    border-radius: var(--tblr-border-radius);
+    background: var(--tblr-border-color-translucent);
+    animation: kimai-calendar-pulse 1.2s ease-in-out infinite;
+}
+
+.kimai-calendar-skeleton-pill-lg {
+    width: 10rem;
+}
+
+.kimai-calendar-skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+.kimai-calendar-skeleton-cell {
+    aspect-ratio: 1;
+    border-radius: var(--tblr-border-radius);
+    background: var(--tblr-border-color-translucent);
+    animation: kimai-calendar-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes kimai-calendar-pulse {
+    0%, 100% {
+        opacity: 0.45;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}

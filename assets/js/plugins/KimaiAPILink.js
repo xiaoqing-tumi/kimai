@@ -89,7 +89,9 @@ export default class KimaiAPILink extends KimaiPlugin {
             data = attributes['payload'];
         }
 
-        document.dispatchEvent(new CustomEvent('kimai.reloadContent'));
+        document.dispatchEvent(new CustomEvent('kimai.reloadContent', {
+            detail: {container: 'section.content', local: true},
+        }));
 
         if (method === 'PATCH') {
             API.patch(url, data, successHandle, errorHandle);

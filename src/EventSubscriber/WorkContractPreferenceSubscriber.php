@@ -14,7 +14,8 @@ use App\Entity\UserPreference;
 use App\Event\UserCreateEvent;
 use App\Event\UserPreferenceEvent;
 use App\WorkingTime\Calculator\WorkingTimeCalculatorDay;
-use App\WorkingTime\Mode\WorkingTimeModeNone;
+use App\WorkingTime\Mode\WorkingTimeModeDay;
+use App\Timesheet\Shift\ShiftResolver;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class WorkContractPreferenceSubscriber implements EventSubscriberInterface
@@ -44,18 +45,19 @@ final class WorkContractPreferenceSubscriber implements EventSubscriberInterface
     private function registerUserPreferences(User $user): void
     {
         $prefs = [
-            UserPreference::WORK_CONTRACT_TYPE => WorkingTimeModeNone::ID,
-            WorkingTimeCalculatorDay::WORK_HOURS_MONDAY => 0,
-            WorkingTimeCalculatorDay::WORK_HOURS_TUESDAY => 0,
-            WorkingTimeCalculatorDay::WORK_HOURS_WEDNESDAY => 0,
-            WorkingTimeCalculatorDay::WORK_HOURS_THURSDAY => 0,
-            WorkingTimeCalculatorDay::WORK_HOURS_FRIDAY => 0,
-            WorkingTimeCalculatorDay::WORK_HOURS_SATURDAY => 0,
-            WorkingTimeCalculatorDay::WORK_HOURS_SUNDAY => 0,
+            UserPreference::WORK_CONTRACT_TYPE => WorkingTimeModeDay::ID,
+            WorkingTimeCalculatorDay::WORK_HOURS_MONDAY => 28800,
+            WorkingTimeCalculatorDay::WORK_HOURS_TUESDAY => 28800,
+            WorkingTimeCalculatorDay::WORK_HOURS_WEDNESDAY => 28800,
+            WorkingTimeCalculatorDay::WORK_HOURS_THURSDAY => 28800,
+            WorkingTimeCalculatorDay::WORK_HOURS_FRIDAY => 28800,
+            WorkingTimeCalculatorDay::WORK_HOURS_SATURDAY => 28800,
+            WorkingTimeCalculatorDay::WORK_HOURS_SUNDAY => 28800,
             UserPreference::PUBLIC_HOLIDAY_GROUP => null,
             UserPreference::HOLIDAYS_PER_YEAR => 0.0,
             'work_start_day' => null,
             'work_last_day' => null,
+            ShiftResolver::USER_PREFERENCE_DEFAULT_SHIFT => 'A',
         ];
 
         foreach ($prefs as $prefName => $defaultValue) {

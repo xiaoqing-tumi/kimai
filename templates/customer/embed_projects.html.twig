@@ -9,7 +9,7 @@
             {%- if is_granted('report:project') and is_granted('budget_any', 'project') -%}
                 {{ widgets.card_tool_button('reporting', {'title': 'report_project_view', 'translation_domain': 'reporting', 'url': path('report_project_view', {'customer': customer.id})}) }}
             {%- endif -%}
-            {%- if customer.visible and is_granted('create_project') -%}
+            {%- if customer.visible and is_granted('create_project') and is_granted('edit', customer) -%}
                 {{ widgets.card_tool_button('create', {'class': 'modal-ajax-form open-edit', 'title': 'create', 'url': path('admin_project_create_with_customer', {'customer': customer.id})}) }}
             {%- endif -%}
         {% endblock %}

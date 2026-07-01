@@ -168,7 +168,7 @@ export default class KimaiAPI extends KimaiPlugin {
             });
         } else {
             response.text().then(() => {
-                const resultError = '[' + response.statusCode + '] ' + response.statusText;
+                const resultError = '[' + response.status + '] ' + response.statusText;
                 this.getPlugin('alert').error(message, resultError);
             });
         }

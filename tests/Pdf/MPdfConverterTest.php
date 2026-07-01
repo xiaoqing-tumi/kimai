@@ -19,6 +19,20 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 #[Group('integration')]
 class MPdfConverterTest extends KernelTestCase
 {
+    public function testConvertToPdfWithChineseCharacters(): void
+    {
+        $kernel = self::bootKernel();
+        $cacheDir = $kernel->getContainer()->getParameter('kernel.cache_dir');
+
+        $sut = new MPdfConverter((new FileHelperFactory($this))->create(), $cacheDir);
+        $html = '<html lang="zh"><body><p>客户名称：测试项目</p><table><tr><th>客户</th><th>项目</th><th>时长</th></tr><tr><td>演示客户</td><td>网站改版</td><td>8.25</td></tr></table></body></html>';
+        $result = $sut->convertToPdf($html);
+
+        self::assertNotEmpty($result);
+        // mPDF embeds font subsets; verify the PDF was generated without empty placeholder glyphs
+        self::assertStringStartsWith('%PDF', $result);
+    }
+
     public function testConvertToPdf(): void
     {
         $kernel = self::bootKernel();

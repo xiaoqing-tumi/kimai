@@ -1,4 +1,11 @@
 :root {
+    --kimai-brand: var(--tblr-red);
+    --kimai-brand-rgb: var(--tblr-red-rgb);
+    --kimai-brand-lt: var(--tblr-red-lt);
+    --kimai-brand-fg: var(--tblr-red-fg);
+    --kimai-accent: var(--tblr-orange);
+    --kimai-accent-lt: var(--tblr-orange-lt);
+
     --kimai-public-holiday: var(--tblr-lime);
     --kimai-holiday: var(--tblr-green);
     --kimai-sickness: var(--tblr-yellow);

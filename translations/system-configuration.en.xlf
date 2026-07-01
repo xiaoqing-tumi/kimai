@@ -294,6 +294,18 @@
         <source>timesheet.rules.long_running_duration</source>
         <target>Maximum duration of a timesheet record in minutes before saving is rejected (0 = deactivated)</target>
       </trans-unit>
+      <trans-unit id="mxh001" resname="timesheet.rules.max_hours_per_day">
+        <source>timesheet.rules.max_hours_per_day</source>
+        <target>Maximum net working hours per weekday (0 = deactivated)</target>
+      </trans-unit>
+      <trans-unit id="mxh002" resname="timesheet.rules.max_hours_weekend">
+        <source>timesheet.rules.max_hours_weekend</source>
+        <target>Maximum net working hours per weekend day (0 = deactivated)</target>
+      </trans-unit>
+      <trans-unit id="mxh003" resname="timesheet.rules.shift_lunch_break_seconds">
+        <source>timesheet.rules.shift_lunch_break_seconds</source>
+        <target>Lunch break duration in seconds for full-day shift templates (default 3600 = 1 hour)</target>
+      </trans-unit>
       <trans-unit id="xlNjElF" resname="calendar.dragdrop_amount">
         <source>calendar.dragdrop_amount</source>
         <target>Amount of entries for drag&amp;drop (0 = deactivated)</target>

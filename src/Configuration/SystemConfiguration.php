@@ -387,6 +387,21 @@ final class SystemConfiguration
         return (int) $this->find('timesheet.rules.long_running_duration');
     }
 
+    public function getTimesheetMaxHoursPerDay(): int
+    {
+        return (int) $this->find('timesheet.rules.max_hours_per_day');
+    }
+
+    public function getTimesheetMaxHoursWeekend(): int
+    {
+        return (int) $this->find('timesheet.rules.max_hours_weekend');
+    }
+
+    public function getShiftLunchBreakSeconds(): int
+    {
+        return (int) $this->find('timesheet.rules.shift_lunch_break_seconds');
+    }
+
     public function getTimesheetDefaultBeginTime(): string
     {
         return (string) $this->find('timesheet.default_begin');

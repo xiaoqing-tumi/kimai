@@ -182,6 +182,35 @@ class TimesheetControllerTest extends AbstractControllerBaseTestCase
         self::assertEquals(5, \count($result));
     }
 
+    public function testExportSelectedTimesheetsAction(): void
+    {
+        $client = $this->getClientForAuthenticatedUser();
+
+        $fixture = new TimesheetFixtures();
+        $fixture->setAmount(3);
+        $fixture->setUser($this->getUserByRole(User::ROLE_USER));
+        $fixture->setStartDate(new \DateTime('-1 day'));
+        $this->importFixture($fixture);
+
+        $this->request($client, '/timesheet/');
+        self::assertTrue($client->getResponse()->isSuccessful());
+
+        $selectedId = $client->getCrawler()->filter('input.multi_update_single')->first()->attr('value');
+        self::assertNotEmpty($selectedId);
+
+        $form = $client->getCrawler()->filter('form.searchform')->form();
+        $form->getNode()->setAttribute('action', $this->createUrl('/timesheet/export/print'));
+        $client->submit($form, [
+            'state' => 1,
+            'timesheets' => [$selectedId],
+        ]);
+
+        self::assertTrue($client->getResponse()->isSuccessful());
+
+        $result = $client->getCrawler()->filter('section.invoice table.table tbody tr');
+        self::assertEquals(1, \count($result));
+    }
+
     public function testExporterNotFoundAction(): void
     {
         $client = $this->getClientForAuthenticatedUser(User::ROLE_ADMIN);

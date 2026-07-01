@@ -1,0 +1,8 @@
+# Local dev overrides — see https://www.kimai.org/documentation/local-yaml.html
+kimai:
+    defaults:
+        user:
+            language: zh_CN
+            timezone: Asia/Shanghai
+    user:
+        wizard: false

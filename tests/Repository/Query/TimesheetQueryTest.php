@@ -51,6 +51,18 @@ class TimesheetQueryTest extends BaseQueryTest
         $this->assertResetByFormError(new TimesheetQuery(), 'begin', 'DESC');
     }
 
+    public function testTimesheetIds(): void
+    {
+        $sut = new TimesheetQuery();
+
+        self::assertFalse($sut->hasTimesheetIds());
+        self::assertEquals([], $sut->getTimesheetIds());
+
+        $sut->setTimesheetIds([3, 1, 3, 0, -1, '5']);
+        self::assertTrue($sut->hasTimesheetIds());
+        self::assertEquals([3, 1, 5], $sut->getTimesheetIds());
+    }
+
     protected function assertMaxResults(TimesheetQuery $sut): void
     {
         self::assertNull($sut->getMaxResults());

@@ -47,7 +47,7 @@ final class CustomerSubscriber extends AbstractActionsSubscriber
         }
 
         if ($isListingView) {
-            if ($customer->isVisible() && $this->isGranted('create_project')) {
+            if ($customer->isVisible() && $this->isGranted('create_project') && $this->isGranted('edit', $customer)) {
                 $event->addAction('create-project', [
                     'icon' => 'create',
                     'url' => $this->path('admin_project_create_with_customer', ['customer' => $customer->getId()]),
@@ -60,11 +60,11 @@ final class CustomerSubscriber extends AbstractActionsSubscriber
             $event->addDivider();
         }
 
-        if ($this->isGranted('view_project') || $this->isGranted('view_teamlead_project') || $this->isGranted('view_team_project')) {
+        if (($this->isGranted('view_project') || $this->isGranted('view_teamlead_project') || $this->isGranted('view_team_project')) && $this->isGranted('listing', 'project')) {
             $event->addActionToSubmenu('filter', 'project', ['title' => 'projects', 'url' => $this->path('admin_project', ['customers[]' => $customer->getId()])]);
         }
 
-        if ($this->isGranted('view_activity')) {
+        if ($this->isGranted('view_activity') && $this->isGranted('listing', 'activity')) {
             $event->addActionToSubmenu('filter', 'activity', ['title' => 'activities', 'url' => $this->path('admin_activity', ['customers[]' => $customer->getId()])]);
         }
 

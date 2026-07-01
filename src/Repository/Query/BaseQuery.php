@@ -25,7 +25,7 @@ class BaseQuery
 {
     public const ORDER_ASC = 'ASC';
     public const ORDER_DESC = 'DESC';
-    public const DEFAULT_PAGESIZE = 50;
+    public const DEFAULT_PAGESIZE = 25;
 
     /** @var array<string, string|int|null|bool|array<mixed>|DateRange> */
     private array $defaults = [

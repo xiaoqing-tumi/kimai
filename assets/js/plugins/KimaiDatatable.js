@@ -11,6 +11,7 @@
 
 import KimaiPlugin from "../KimaiPlugin";
 import KimaiContextMenu from "../widgets/KimaiContextMenu";
+import KimaiPageLoader from "../widgets/KimaiPageLoader";
 
 export default class KimaiDatatable extends KimaiPlugin {
 
@@ -18,6 +19,7 @@ export default class KimaiDatatable extends KimaiPlugin {
         super();
         this._contentArea = contentAreaSelector;
         this._selector = tableSelector;
+        this._reloadAbortController = null;
     }
 
     getId() {
@@ -25,28 +27,53 @@ export default class KimaiDatatable extends KimaiPlugin {
     }
 
     init() {
+        document.addEventListener('kimai.reloadPage', () => {
+            this._bindReloadEvents();
+            this._registerContextMenuIfPresent();
+        });
+
+        this._bindReloadEvents();
+        this._registerContextMenuIfPresent();
+    }
+
+    _bindReloadEvents() {
+        if (this._reloadAbortController !== null) {
+            this._reloadAbortController.abort();
+            this._reloadAbortController = null;
+        }
+
         const dataTable = document.querySelector(this._selector);
 
-        // not every page contains a dataTable
         if (dataTable === null) {
             return;
         }
 
-        this.registerContextMenu(this._selector);
-
         const events = dataTable.dataset['reloadEvent'];
+
         if (events === undefined) {
             return;
         }
 
+        this._reloadAbortController = new AbortController();
+        const signal = this._reloadAbortController.signal;
         const handle = () => { this.reloadDatatable(); };
 
-        for (let eventName of events.split(' ')) {
-            document.addEventListener(eventName, handle);
+        for (const eventName of events.split(' ')) {
+            if (eventName === '') {
+                continue;
+            }
+
+            document.addEventListener(eventName, handle, {signal});
         }
 
-        document.addEventListener('pagination-change', handle);
-        document.addEventListener('filter-change', handle);
+        document.addEventListener('pagination-change', handle, {signal});
+        document.addEventListener('filter-change', handle, {signal});
+    }
+
+    _registerContextMenuIfPresent() {
+        if (document.querySelector(this._selector) !== null) {
+            this.registerContextMenu(this._selector);
+        }
     }
 
     /**
@@ -60,6 +87,8 @@ export default class KimaiDatatable extends KimaiPlugin {
 
     reloadDatatable()
     {
+        KimaiPageLoader.invalidateCache(document.location.href);
+
         const toolbarSelector = this.getContainer().getPlugin('toolbar').getSelector();
 
         /** @type {HTMLFormElement} form */
@@ -73,7 +102,9 @@ export default class KimaiDatatable extends KimaiPlugin {
             document.dispatchEvent(new Event('kimai.reloadedContent'));
         };
 
-        document.dispatchEvent(new CustomEvent('kimai.reloadContent', {detail: this._contentArea}));
+        document.dispatchEvent(new CustomEvent('kimai.reloadContent', {
+            detail: {container: this._contentArea, local: true},
+        }));
 
         if (form === null) {
             this.fetch(document.location)

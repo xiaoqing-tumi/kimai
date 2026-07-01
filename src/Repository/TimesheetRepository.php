@@ -194,6 +194,32 @@ class TimesheetRepository extends EntityRepository
         return (int) $tmp;
     }
 
+    public function getDurationForDay(User $user, \DateTimeInterface $dayStart, \DateTimeInterface $dayEnd, ?int $excludeTimesheetId = null): int
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb
+            ->select('COALESCE(SUM(t.duration), 0)')
+            ->from(Timesheet::class, 't')
+            ->andWhere($qb->expr()->eq('t.user', ':user'))
+            ->andWhere($qb->expr()->between('t.begin', ':from', ':to'))
+            ->setParameter('user', $user)
+            ->setParameter('from', $dayStart)
+            ->setParameter('to', $dayEnd);
+
+        if ($excludeTimesheetId !== null) {
+            $qb->andWhere($qb->expr()->neq('t.id', ':excludeId'))
+                ->setParameter('excludeId', $excludeTimesheetId);
+        }
+
+        $result = $qb->getQuery()->getSingleScalarResult();
+
+        if (!is_numeric($result)) {
+            return 0;
+        }
+
+        return (int) $result;
+    }
+
     /**
      * @return array<Revenue>
      */
@@ -627,6 +653,11 @@ class TimesheetRepository extends EntityRepository
         if ($query->hasActivities()) {
             $qb->andWhere($qb->expr()->in('t.activity', ':activity'))
                 ->setParameter('activity', $query->getActivities());
+        }
+
+        if ($query->hasTimesheetIds()) {
+            $qb->andWhere($qb->expr()->in('t.id', ':timesheetIds'))
+                ->setParameter('timesheetIds', $query->getTimesheetIds());
         }
 
         if ($query->hasProjects()) {

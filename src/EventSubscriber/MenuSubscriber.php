@@ -70,6 +70,10 @@ final class MenuSubscriber implements EventSubscriberInterface
             }
 
             $times->addChild(
+                new MenuItemModel('attendance', 'attendance.title', 'attendance', [], 'attendance')
+            );
+
+            $times->addChild(
                 new MenuItemModel('calendar', 'calendar', 'calendar', [], 'calendar')
             );
         }
@@ -89,7 +93,6 @@ final class MenuSubscriber implements EventSubscriberInterface
         }
 
         if ($times->hasChildren()) {
-            $times->setExpanded(true); // Kimai is all about time-tracking, so we expand this menu always
             $menu->addChild($times);
         }
 

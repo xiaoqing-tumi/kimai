@@ -22,6 +22,12 @@ fieldset.form-fieldset > legend {
     --tblr-box-shadow-input: none;
 }
 
+/* Brand focus ring for primary actions */
+.btn-primary:focus,
+.btn-primary:focus-visible {
+    box-shadow: 0 0 0 0.2rem rgba(var(--tblr-primary-rgb), 0.25);
+}
+
 .navbar[data-bs-theme=dark] {
     /* give navigation elements slightly higher contrast */
     --tblr-navbar-color: hsla(0,0%,100%,.8);

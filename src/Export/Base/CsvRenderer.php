@@ -73,7 +73,8 @@ final class CsvRenderer extends AbstractSpreadsheetRenderer implements ExportRen
         }
 
         $options = new Options();
-        $options->SHOULD_ADD_BOM = false;
+        // UTF-8 BOM helps Excel and similar tools open non-Latin characters correctly.
+        $options->SHOULD_ADD_BOM = true;
 
         $opts = $this->template->getOptions();
         if (\array_key_exists('separator', $opts) && $opts['separator'] === ';') {

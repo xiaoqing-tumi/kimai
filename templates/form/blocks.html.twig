@@ -40,7 +40,13 @@
 {%- endblock %}
 
 {% block quick_entry_week_row %}
-    <tr{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group qe-entry-week-row' ~ (not valid ? ' is-invalid'))|trim})} %}{{ block('attributes') }}{% endwith %}>
+    {% set canRemove = true %}
+    {% for timesheet in form.timesheets %}
+        {% if timesheet.duration.vars.disabled or timesheet.vars.data.isRunning %}
+            {% set canRemove = false %}
+        {% endif %}
+    {% endfor %}
+    <tr{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group qe-entry-week-row' ~ (not valid ? ' is-invalid'))|trim, 'data-has-existing': form.vars.data.hasExistingTimesheet() ? '1' : '0'})} %}{{ block('attributes') }}{% endwith %}>
         <td>
             {{ form_row(form.project, {row_attr: {class: 'p-0'}}) }}
         </td>
@@ -58,7 +64,14 @@
             </td>
         {% endfor %}
         <td class="text-nowrap text-center total qe-totals-row"></td>
+        <td class="text-center qe-actions-cell">
+            <button type="button" class="btn btn-ghost-danger btn-icon remove-item-link" title="{{ 'action.delete'|trans }}" aria-label="{{ 'action.delete'|trans }}"{% if not canRemove %} disabled{% endif %}>{{ icon('trash', true) }}</button>
+        </td>
     </tr>
+{% endblock %}
+
+{% block _quick_entry_form_rows_entry_row %}
+    {{ block('quick_entry_week_row') }}
 {% endblock %}
 
 {% block _team_edit_form_members_entry_user_widget %}

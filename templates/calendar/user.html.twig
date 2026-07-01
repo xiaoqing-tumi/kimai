@@ -2,6 +2,7 @@
 {% import "macros/widgets.html.twig" as widgets %}
 
 {% block main %}
+    {% set calendarScripts = encore_entry_js_files('calendar') %}
     <div class="row">
         {% set hasTwoColumns = (config.dragDropAmount > 0 and dragAndDrop is not empty and (dragAndDrop|filter(s => s.entries|length > 0)|length > 0)) or form is not null %}
         {% if hasTwoColumns %}
@@ -57,7 +58,21 @@
         <div class="col-xs-12 {% if hasTwoColumns %}col-md-8 col-lg-9 col-print-12{% endif %}">
             {% embed '@theme/embeds/card.html.twig' with {fullsize: true}  %}
                 {% block box_body %}
-                    <div id="timesheet_calendar"></div>
+                    <div id="timesheet_calendar" data-calendar-scripts="{{ calendarScripts|json_encode|e('html_attr') }}">
+                        <div class="kimai-calendar-placeholder" aria-hidden="true">
+                            <div class="kimai-calendar-skeleton-toolbar">
+                                <span class="kimai-calendar-skeleton-pill kimai-calendar-skeleton-pill-lg"></span>
+                                <span class="kimai-calendar-skeleton-pill"></span>
+                                <span class="kimai-calendar-skeleton-pill"></span>
+                                <span class="kimai-calendar-skeleton-pill"></span>
+                            </div>
+                            <div class="kimai-calendar-skeleton-grid">
+                                {% for i in 1..35 %}
+                                    <div class="kimai-calendar-skeleton-cell"></div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                 {% endblock %}
             {% endembed %}
         </div>
@@ -71,7 +86,12 @@
 
 {% block head %}
     {{ parent() }}
-    {{ encore_entry_script_tags('calendar') }}
+    {# Load calendar bundle asynchronously so it does not block Kimai startup #}
+    {% for path in encore_entry_js_files('calendar') %}
+        {% if 'runtime' not in path %}
+            <script src="{{ path }}" async></script>
+        {% endif %}
+    {% endfor %}
 {% endblock %}
 
 {% block javascripts %}
@@ -118,7 +138,58 @@
             history.replaceState(null, null, "?" + queryParams.toString());
         });
 
-        document.addEventListener('kimai.initialized', function(event) {
+        const loadCalendarBundle = () => {
+            const element = document.getElementById('{{ calendarSelector }}');
+            const scripts = JSON.parse(element.dataset.calendarScripts || '[]');
+            const loaders = [];
+
+            scripts.forEach((src) => {
+                if (src.includes('runtime') && document.querySelector('script[src*="runtime"]') !== null) {
+                    return;
+                }
+
+                if (document.querySelector('script[src="' + src + '"]') !== null) {
+                    return;
+                }
+
+                loaders.push(new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.async = true;
+                    script.onload = () => resolve();
+                    script.onerror = () => reject(new Error('Failed loading ' + src));
+                    document.head.appendChild(script);
+                }));
+            });
+
+            return Promise.all(loaders);
+        };
+
+        const bootCalendar = async function(event) {
+            const element = document.getElementById('{{ calendarSelector }}');
+
+            if (element === null || element.dataset.calendarBooted === '1') {
+                return;
+            }
+
+            if (typeof KimaiCalendar === 'undefined') {
+                try {
+                    await loadCalendarBundle();
+                } catch (error) {
+                    console.error('Kimai calendar failed to load', error);
+
+                    return;
+                }
+            }
+
+            if (typeof KimaiCalendar === 'undefined') {
+                window.setTimeout(() => bootCalendar(event), 50);
+
+                return;
+            }
+
+            element.dataset.calendarBooted = '1';
+
             const kimai = event.detail.kimai;
 
             let calendarOptions = {
@@ -231,16 +302,28 @@
             );
             calendar.render();
 
-            document.querySelector('.fc-today-button').classList.remove('btn-icon');
-            document.querySelector('.fc-header-toolbar').classList.toggle('row');
-            document.querySelector('.fc-header-toolbar').classList.add('p-3');
+            const todayButton = document.querySelector('.fc-today-button');
+            if (todayButton !== null) {
+                todayButton.classList.remove('btn-icon');
+            }
+
+            const headerToolbar = document.querySelector('.fc-header-toolbar');
+            if (headerToolbar !== null) {
+                headerToolbar.classList.toggle('row');
+                headerToolbar.classList.add('p-3');
+            }
+
             const toolbar = document.querySelectorAll('.fc-header-toolbar .fc-toolbar-chunk');
-            toolbar[0].parentElement.classList.add('p-3');
-            toolbar[0].classList.add('col-md-4', 'col-6', 'mb-1', 'text-start', 'order-xs-1');
-            toolbar[1].classList.add('col-md-4', 'col-12', 'mb-1', 'text-center', 'order-3');
-            toolbar[2].classList.add('col-md-4', 'col-6', 'mb-1', 'text-end', 'order-md-4', 'order-xs-2');
+            if (toolbar.length >= 3) {
+                toolbar[0].parentElement.classList.add('p-3');
+                toolbar[0].classList.add('col-md-4', 'col-6', 'mb-1', 'text-start', 'order-xs-1');
+                toolbar[1].classList.add('col-md-4', 'col-12', 'mb-1', 'text-center', 'order-3');
+                toolbar[2].classList.add('col-md-4', 'col-6', 'mb-1', 'text-end', 'order-md-4', 'order-xs-2');
+            }
 
             KimaiReloadPageWidget.create('kimai.systemConfigUpdate', true);
-        });
+        };
+
+        document.addEventListener('kimai.initialized', bootCalendar);
     </script>
 {% endblock %}

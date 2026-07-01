@@ -1,0 +1,40 @@
+.attendance-page {
+    --attendance-shift-a-bg: var(--kimai-brand-lt);
+    --attendance-shift-a-color: var(--kimai-brand);
+    --attendance-shift-b-bg: var(--kimai-accent-lt);
+    --attendance-shift-b-color: var(--kimai-accent);
+
+    .attendance-shift {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+
+        &__badge {
+            display: inline-block;
+            font-weight: 600;
+            font-size: 0.8125rem;
+            line-height: 1.4;
+            padding: 0.25rem 0.625rem;
+            border-radius: var(--tblr-border-radius);
+        }
+
+        &--a .attendance-shift__badge {
+            background-color: var(--attendance-shift-a-bg);
+            color: var(--attendance-shift-a-color);
+            border: 1px solid rgba(var(--kimai-brand-rgb), 0.35);
+        }
+
+        &--b .attendance-shift__badge {
+            background-color: var(--attendance-shift-b-bg);
+            color: var(--attendance-shift-b-color);
+            border: 1px solid rgba(var(--tblr-orange-rgb), 0.35);
+        }
+
+        &__time {
+            color: var(--tblr-body-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+    }
+}

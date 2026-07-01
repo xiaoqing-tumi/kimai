@@ -87,6 +87,24 @@ export default class KimaiToolbar extends KimaiPlugin {
                     if (form === null) {
                         return;
                     }
+
+                    form.querySelectorAll('input[name="timesheets[]"].export-selection').forEach((element) => {
+                        element.remove();
+                    });
+
+                    const selectedCheckbox = document.querySelector('input.multi_update_single');
+                    if (selectedCheckbox !== null) {
+                        const table = selectedCheckbox.closest('table');
+                        for (const box of table.querySelectorAll('input.multi_update_single:checked')) {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'timesheets[]';
+                            input.value = box.value;
+                            input.classList.add('export-selection');
+                            form.appendChild(input);
+                        }
+                    }
+
                     const prevAction = form.getAttribute('action');
                     const prevMethod = form.getAttribute('method');
                     if (target.dataset.target !== undefined) {
@@ -149,7 +167,7 @@ export default class KimaiToolbar extends KimaiPlugin {
                 return;
             }
 
-            let pager = document.querySelector(formSelector + " input#page");
+            let pager = document.querySelector(formSelector + ' input#page');
             if (pager === null) {
                 return;
             }
@@ -162,12 +180,24 @@ export default class KimaiToolbar extends KimaiPlugin {
 
             event.preventDefault();
             event.stopPropagation();
-            let urlParts = target.href.split('/');
-            let pageNumber = urlParts[urlParts.length - 1];
-            // page number usually is the default value and is therefor missing from the URL
-            if (!/\d/.test(pageNumber)) {
+
+            let pageNumber = 1;
+
+            try {
+                const url = new URL(target.href);
+                const pageMatch = url.pathname.match(/\/page\/(\d+)(?:\/|$)/);
+
+                if (pageMatch !== null) {
+                    pageNumber = parseInt(pageMatch[1], 10);
+                }
+            } catch {
                 pageNumber = 1;
             }
+
+            if (pageNumber < 1) {
+                pageNumber = 1;
+            }
+
             pager.value = pageNumber;
             pager.dispatchEvent(new Event('change'));
             document.dispatchEvent(new Event('pagination-change'));

@@ -79,6 +79,12 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
         if (this._project !== undefined) {
             delete this._project;
         }
+
+        if (this._break !== undefined && this._break !== null) {
+            this._break.removeEventListener('change', this._breakListener);
+            delete this._breakListener;
+            delete this._break;
+        }
     }
 
     activateForm(form)
@@ -112,6 +118,7 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
         this._endTime = document.getElementById(formPrefix + '_end_time');
         this._duration = document.getElementById(formPrefix + '_duration');
         this._durationToggle = document.getElementById(formPrefix + '_duration_toggle');
+        this._break = document.getElementById(formPrefix + '_break');
 
         if (this._beginDate === null || this._beginTime === null || this._endTime === null || this._duration === null) {
             return;
@@ -124,6 +131,7 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
         this._durationListener = () => this._changedDuration();
         this._durationKeyListener = (event) => this._changeDurationOnKeypress(event);
         this._durationBlurListener = () => this._parseDuration();
+        this._breakListener = () => this._updateDuration();
 
         this._beginDate.addEventListener('change', this._beginListener);
         this._beginTime.addEventListener('change', this._beginListener);
@@ -133,6 +141,10 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
         this._duration.addEventListener('change', this._durationListener);
         this._duration.addEventListener('keydown', this._durationKeyListener);
         this._duration.addEventListener('blur', this._durationBlurListener);
+
+        if (this._break !== null) {
+            this._break.addEventListener('change', this._breakListener);
+        }
 
         if (this._duration !== null && this._durationToggle !== null) {
             this._durationToggleListener = () => {
@@ -451,9 +463,32 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
 
         if (begin !== null && end !== null) {
             newDuration = end.diff(begin);
+            const breakSeconds = this._getBreakSeconds();
+            if (breakSeconds > 0) {
+                newDuration = newDuration.minus({seconds: breakSeconds});
+            }
         }
 
         this._setDurationAsString(newDuration);
+    }
+
+    /**
+     * @private
+     * @return {number}
+     */
+    _getBreakSeconds()
+    {
+        if (this._break === null || this._break === undefined || this._break.value === '') {
+            return 0;
+        }
+
+        const breakDuration = this.getDateUtils().parseDuration(this._break.value);
+
+        if (!breakDuration.isValid) {
+            return 0;
+        }
+
+        return breakDuration.as('seconds');
     }
 
     /**
@@ -490,7 +525,7 @@ export default class KimaiTimesheetForm extends KimaiFormPlugin {
         } else if (begin === null && end !== null) {
             this._applyDateToField(end.minus({seconds: seconds}), this._beginDate, this._beginTime);
         } else if (begin !== null && seconds >= 0) {
-            this._addSecondsToEndDate(begin, seconds);
+            this._addSecondsToEndDate(begin, seconds + this._getBreakSeconds());
         }
     }
 

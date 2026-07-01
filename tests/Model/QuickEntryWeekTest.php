@@ -32,5 +32,28 @@ class QuickEntryWeekTest extends TestCase
 
         $sut->setRows($rows);
         self::assertSame($rows, $sut->getRows());
+        self::assertFalse($sut->hasRowsWithExistingTimesheets());
+    }
+
+    public function testHasRowsWithExistingTimesheets(): void
+    {
+        $user = new User();
+        $sut = new QuickEntryWeek(new \DateTime());
+
+        $emptyRow = new QuickEntryModel($user);
+        $sut->setRows([$emptyRow]);
+        self::assertFalse($sut->hasRowsWithExistingTimesheets());
+
+        $timesheet = new \App\Entity\Timesheet();
+        $timesheet->setUser($user);
+        $timesheet->setBegin(new \DateTime());
+        $timesheet->setEnd(new \DateTime());
+        $idProperty = new \ReflectionProperty(\App\Entity\Timesheet::class, 'id');
+        $idProperty->setValue($timesheet, 1);
+
+        $rowWithData = new QuickEntryModel($user);
+        $rowWithData->addTimesheet($timesheet);
+        $sut->setRows([$rowWithData]);
+        self::assertTrue($sut->hasRowsWithExistingTimesheets());
     }
 }

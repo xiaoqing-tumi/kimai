@@ -61,7 +61,7 @@
 
     {% set tableName = 'user_admin_permissions' %}
 
-    {{ tables.datatable_header(tableName, columns, null, {'reload': 'kimai.userRoleUpdate'}) }}
+    {{ tables.datatable_header(tableName, columns, null) }}
     
     {% set colspan = 1 + (roles|length) %}
 
@@ -97,68 +97,87 @@
 
     <div style="display: none" id="permission-token" data-value="{{ token }}"></div>
 
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
     <script type="text/javascript">
-        function getPermissionToken() {
-            return document.getElementById('permission-token').dataset['value'];
-        }
-        function setPermissionToken(token) {
-            document.getElementById('permission-token').dataset['value'] = token;
-        }
+        (function () {
+            if (window.__kimaiPermissionsBound) {
+                return;
+            }
+            window.__kimaiPermissionsBound = true;
 
-        document.addEventListener('kimai.initialized', (event) => {
-            const FETCHER = event.detail.kimai.getPlugin('fetch');
-            for (const element of document.querySelectorAll('a.togglePerm')) {
-                element.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    event.preventDefault();
+            function getPermissionToken() {
+                const tokenElement = document.getElementById('permission-token');
 
-                    let target = event.target;
-                    if (!target.matches('a')) {
-                        target = target.parentNode;
-                    }
-
-                    let linkElement = target;
-                    linkElement.innerHTML = '<i class="{{ 'spinner'|icon }} fa-pulse"></i>';
-
-                    const isActive = linkElement.classList.contains('permOn');
-                    let url = linkElement.dataset['href'].replace(/__VALUE__/, isActive ? '0' : '1').replace(/__TOKEN__/, getPermissionToken());
-
-                    /** @type {KimaiFetch} FETCHER */
-                    const headers = new Headers();
-                    headers.append('Content-Type', 'application/json');
-
-                    const options = {method: 'POST', headers: headers};
-
-                    FETCHER.fetch(url, options)
-                        .then(response => {
-                            response.json().then(json => {
-                                linkElement.classList.toggle('permOn');
-                                linkElement.classList.toggle('permOff');
-                                toggleLabel(linkElement, !isActive);
-                                setPermissionToken(json.token);
-                            });
-                        })
-                        .catch(error => {
-                            kimai.getPlugin('alert').error('action.update.error');
-                            toggleLabel(linkElement, isActive);
-                        })
-                    ;
-                });
+                return tokenElement !== null ? tokenElement.dataset['value'] : '';
             }
 
-            KimaiReloadPageWidget.create('kimai.userRoleUpdate', true);
-        });
+            function setPermissionToken(token) {
+                const tokenElement = document.getElementById('permission-token');
 
-        function toggleLabel(element, showTrue) {
-            if (showTrue) {
-                element.innerHTML = '{{ widgets.label_boolean(true)|trim|e('js') }}';
-            } else {
-                element.innerHTML = '{{ widgets.label_boolean(false)|trim|e('js') }}';
+                if (tokenElement !== null) {
+                    tokenElement.dataset['value'] = token;
+                }
             }
-        }
+
+            function toggleLabel(element, showTrue) {
+                if (showTrue) {
+                    element.innerHTML = '{{ widgets.label_boolean(true)|trim|e('js') }}';
+                } else {
+                    element.innerHTML = '{{ widgets.label_boolean(false)|trim|e('js') }}';
+                }
+            }
+
+            document.addEventListener('kimai.initialized', () => {
+                KimaiReloadPageWidget.create('kimai.userRoleUpdate', false);
+            });
+
+            document.addEventListener('click', (event) => {
+                const linkElement = event.target.closest('a.togglePerm');
+
+                if (linkElement === null || window.kimai === undefined) {
+                    return;
+                }
+
+                event.stopPropagation();
+                event.preventDefault();
+
+                if (linkElement.dataset.permissionSaving === '1') {
+                    return;
+                }
+
+                linkElement.dataset.permissionSaving = '1';
+
+                const kimai = window.kimai;
+                const FETCHER = kimai.getPlugin('fetch');
+                const API = kimai.getPlugin('api');
+
+                linkElement.innerHTML = '<i class="{{ 'spinner'|icon }} fa-pulse"></i>';
+
+                const isActive = linkElement.classList.contains('permOn');
+                const url = linkElement.dataset['href']
+                    .replace(/__VALUE__/, isActive ? '0' : '1')
+                    .replace(/__TOKEN__/, getPermissionToken());
+
+                const headers = new Headers();
+                headers.append('Content-Type', 'application/json');
+
+                FETCHER.fetch(url, {method: 'POST', headers: headers})
+                    .then(response => response.json())
+                    .then(json => {
+                        linkElement.classList.toggle('permOn');
+                        linkElement.classList.toggle('permOff');
+                        toggleLabel(linkElement, !isActive);
+                        setPermissionToken(json.token);
+                    })
+                    .catch(error => {
+                        API.handleError('action.update.error', error);
+                        toggleLabel(linkElement, isActive);
+                    })
+                    .finally(() => {
+                        delete linkElement.dataset.permissionSaving;
+                    })
+                ;
+            });
+        })();
     </script>
+
 {% endblock %}

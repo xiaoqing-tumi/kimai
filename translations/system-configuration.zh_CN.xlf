@@ -248,7 +248,19 @@
       </trans-unit>
       <trans-unit id="vg5G_9i" resname="timesheet.rules.long_running_duration">
         <source>timesheet.rules.long_running_duration</source>
-        <target>在拒绝保存之前，记录的最大持续时间（分钟）（0=停用）</target>
+        <target>工时记录最长持续时间（分钟），超过则拒绝保存（0 = 停用）</target>
+      </trans-unit>
+      <trans-unit id="mxh001" resname="timesheet.rules.max_hours_per_day">
+        <source>timesheet.rules.max_hours_per_day</source>
+        <target>工作日每日净工时上限（小时，0 = 停用）</target>
+      </trans-unit>
+      <trans-unit id="mxh002" resname="timesheet.rules.max_hours_weekend">
+        <source>timesheet.rules.max_hours_weekend</source>
+        <target>周末每日净工时上限（小时，0 = 停用）</target>
+      </trans-unit>
+      <trans-unit id="mxh003" resname="timesheet.rules.shift_lunch_break_seconds">
+        <source>timesheet.rules.shift_lunch_break_seconds</source>
+        <target>全天班次午休时长（秒，默认 3600 = 1 小时）</target>
       </trans-unit>
       <trans-unit id="xlNjElF" resname="calendar.dragdrop_amount">
         <source>calendar.dragdrop_amount</source>

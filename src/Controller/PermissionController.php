@@ -159,7 +159,8 @@ final class PermissionController extends AbstractController
         return $this->render('permission/permissions.html.twig', [
             'users' => $users,
             'page_setup' => $page,
-            'token' => $csrfTokenManager->refreshToken(self::TOKEN_NAME)->getValue(),
+            // getToken instead of refreshToken: background page prefetch must not invalidate the active token
+            'token' => $csrfTokenManager->getToken(self::TOKEN_NAME)->getValue(),
             'roles' => array_values($roles),
             'sorted' => $event->getPermissions(),
             'manager' => $this->manager,

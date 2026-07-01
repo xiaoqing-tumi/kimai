@@ -15,6 +15,8 @@ import KimaiConfiguration from "./KimaiConfiguration";
 import KimaiContainer from "./KimaiContainer";
 import KimaiDatatableColumnView from './plugins/KimaiDatatableColumnView.js';
 import KimaiThemeInitializer from "./plugins/KimaiThemeInitializer";
+import KimaiShiftTimesheet from "./plugins/KimaiShiftTimesheet";
+import KimaiSidebarMenu from "./plugins/KimaiSidebarMenu";
 import KimaiDateRangePicker from "./forms/KimaiDateRangePicker";
 import KimaiDatatable from "./plugins/KimaiDatatable";
 import KimaiToolbar from "./plugins/KimaiToolbar";
@@ -36,6 +38,7 @@ import KimaiEscape from "./plugins/KimaiEscape";
 import KimaiFetch from "./plugins/KimaiFetch";
 import KimaiTimesheetForm from "./forms/KimaiTimesheetForm";
 import KimaiTeamForm from "./forms/KimaiTeamForm";
+import KimaiQuickEntryForm from "./forms/KimaiQuickEntryForm";
 import KimaiCopyDataForm from "./forms/KimaiCopyDataForm";
 import KimaiDateNowForm from "./forms/KimaiDateNowForm";
 import KimaiNotification from "./plugins/KimaiNotification";
@@ -74,6 +77,7 @@ export default class KimaiLoader {
         kimai.registerPlugin(new KimaiAutocompleteTags());
         kimai.registerPlugin(new KimaiTimesheetForm());
         kimai.registerPlugin(new KimaiTeamForm());
+        kimai.registerPlugin(new KimaiQuickEntryForm());
         kimai.registerPlugin(new KimaiCopyDataForm());
         kimai.registerPlugin(new KimaiDateNowForm());
         kimai.registerPlugin(new KimaiForm());
@@ -91,6 +95,8 @@ export default class KimaiLoader {
         kimai.registerPlugin(new KimaiAPILink('api-link'));
         kimai.registerPlugin(new KimaiMultiUpdateTable());
         kimai.registerPlugin(new KimaiThemeInitializer());
+        kimai.registerPlugin(new KimaiShiftTimesheet());
+        kimai.registerPlugin(new KimaiSidebarMenu());
 
         // notify all listeners that Kimai plugins can now be registered
         document.dispatchEvent(new CustomEvent('kimai.pluginRegister', {detail: {'kimai': kimai}}));

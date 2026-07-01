@@ -149,9 +149,10 @@ class WizardSubscriberTest extends TestCase
         self::assertNull($event->getResponse());
     }
 
-    public function testOnKernelRequestIgnoresWizardForRegularUserIfDisabled(): void
+    public function testOnKernelRequestIgnoresWizardIfDisabled(): void
     {
         $user = new User();
+        $user->setRoles([User::ROLE_ADMIN]);
         $token = $this->createUserToken($user);
 
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);

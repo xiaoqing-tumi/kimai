@@ -53,6 +53,16 @@ final class UserContractType extends AbstractType
         foreach ($modes as $mode) {
             $this->contractModeService->getMode($mode)->buildForm($builder, $options); // @phpstan-ignore-line
         }
+
+        $builder->add('default_shift', ChoiceType::class, [
+            'label' => 'default_shift',
+            'translation_domain' => 'messages',
+            'choices' => [
+                'shift.a' => 'A',
+                'shift.b' => 'B',
+            ],
+            'required' => true,
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

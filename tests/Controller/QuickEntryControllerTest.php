@@ -49,8 +49,11 @@ class QuickEntryControllerTest extends AbstractControllerBaseTestCase
                 $columns[] = $childNode;
             }
         }
-        // project + activity + 7 days (duration) + row totals
-        self::assertCount(10, $columns);
+        // project + activity + 7 days (duration) + row totals + actions
+        self::assertCount(11, $columns);
+
+        $removeButtons = $node->filter('button.remove-item-link');
+        self::assertEquals($rows->count(), $removeButtons->count());
     }
 
     public function testIndexActionWith(): void
@@ -86,7 +89,10 @@ class QuickEntryControllerTest extends AbstractControllerBaseTestCase
                 $columns[] = $childNode;
             }
         }
-        // project + activity + 7 days (duration) + row totals
-        self::assertCount(10, $columns);
+        // project + activity + 7 days (duration) + row totals + actions
+        self::assertCount(11, $columns);
+
+        $removeButtons = $node->filter('button.remove-item-link');
+        self::assertGreaterThanOrEqual(1, $removeButtons->count());
     }
 }

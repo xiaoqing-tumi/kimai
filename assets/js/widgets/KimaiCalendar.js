@@ -62,6 +62,7 @@ export default class KimaiCalendar {
      */
     constructor(kimai, element, options) {
         this.kimai = kimai;
+        this.element = element;
         this.options = options;
 
         /** @type {KimaiAPI} API */
@@ -582,6 +583,7 @@ export default class KimaiCalendar {
     }
 
     render() {
+        this.element?.querySelector('.kimai-calendar-placeholder')?.remove();
         this.calendar.render();
     }
 

@@ -6,9 +6,20 @@
         first_dow_iso: iso_day_by_name(fdow),
     }) %}
     <script type="text/javascript">
-        window.addEventListener('load', function() {
-            const loader = new KimaiWebLoader({{ configurations|json_encode|raw }},{{ javascript_translations()|json_encode|raw }});
-            window.kimai = loader.getKimai();
-        });
+        (function() {
+            const configurations = {{ configurations|json_encode|raw }};
+            const translations = {{ javascript_translations()|json_encode|raw }};
+
+            function initKimai() {
+                const loader = new KimaiWebLoader(configurations, translations);
+                window.kimai = loader.getKimai();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initKimai);
+            } else {
+                initKimai();
+            }
+        })();
     </script>
 {% endmacro %}

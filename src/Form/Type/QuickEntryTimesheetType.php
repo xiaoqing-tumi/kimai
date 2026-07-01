@@ -10,6 +10,8 @@
 namespace App\Form\Type;
 
 use App\Entity\Timesheet;
+use App\Timesheet\Shift\ShiftResolverInterface;
+use App\Timesheet\Shift\ShiftTimeCalculator;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,8 +22,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class QuickEntryTimesheetType extends AbstractType
 {
-    public function __construct(private readonly Security $security)
-    {
+    public function __construct(
+        private readonly Security $security,
+        private readonly ShiftResolverInterface $shiftResolver,
+        private readonly ShiftTimeCalculator $shiftTimeCalculator,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -33,6 +38,7 @@ final class QuickEntryTimesheetType extends AbstractType
                 'placeholder' => '0:00',
             ],
             'icon' => null,
+            'preset_hours' => 8,
         ];
 
         $duration = $options['duration_minutes'];
@@ -86,7 +92,6 @@ final class QuickEntryTimesheetType extends AbstractType
             }
         );
 
-        // make sure that duration is mapped back to end field
         $builder->addEventListener(
             FormEvents::SUBMIT,
             function (FormEvent $event): void {
@@ -95,10 +100,17 @@ final class QuickEntryTimesheetType extends AbstractType
                 $duration = $data->getDuration(false);
                 try {
                     if (null !== $duration) {
-                        $duration += $data->getBreak();
-                        $end = clone $data->getBegin();
-                        $end->modify('+ ' . abs($duration) . ' seconds');
-                        $data->setEnd($end);
+                        $user = $data->getUser();
+                        $begin = $data->getBegin();
+                        if ($user !== null && $begin !== null) {
+                            $shift = $this->shiftResolver->resolve($user, $begin);
+                            $this->shiftTimeCalculator->applyNetDuration($data, $shift);
+                        } else {
+                            $duration += $data->getBreak();
+                            $end = clone $data->getBegin();
+                            $end->modify('+ ' . abs($duration) . ' seconds');
+                            $data->setEnd($end);
+                        }
                     } else {
                         $data->setDuration(null);
                     }
@@ -115,7 +127,7 @@ final class QuickEntryTimesheetType extends AbstractType
             'data_class' => Timesheet::class,
             'timezone' => date_default_timezone_get(),
             'duration_minutes' => null,
-            'duration_hours' => 10,
+            'duration_hours' => 8,
         ]);
     }
 }

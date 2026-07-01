@@ -328,6 +328,33 @@ final class Configuration implements ConfigurationInterface
                         ->integerNode('long_running_duration')
                             ->defaultValue(0)
                         ->end()
+                        ->integerNode('max_hours_per_day')
+                            ->defaultValue(8)
+                            ->validate()
+                                ->ifTrue(function ($value) {
+                                    return $value < 0;
+                                })
+                                ->thenInvalid('max_hours_per_day must be at least 0')
+                            ->end()
+                        ->end()
+                        ->integerNode('max_hours_weekend')
+                            ->defaultValue(8)
+                            ->validate()
+                                ->ifTrue(function ($value) {
+                                    return $value < 0;
+                                })
+                                ->thenInvalid('max_hours_weekend must be at least 0')
+                            ->end()
+                        ->end()
+                        ->integerNode('shift_lunch_break_seconds')
+                            ->defaultValue(3600)
+                            ->validate()
+                                ->ifTrue(function ($value) {
+                                    return $value < 0;
+                                })
+                                ->thenInvalid('shift_lunch_break_seconds must be at least 0')
+                            ->end()
+                        ->end()
                         ->booleanNode('require_activity')
                             ->defaultTrue()
                         ->end()

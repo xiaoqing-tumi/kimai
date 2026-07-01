@@ -89,7 +89,7 @@ final class PdfTemplateRenderer implements DispositionInlineInterface, ExportRen
             $options['budgets'] = $this->calculateProjectBudget($exportItems, $query, $this->projectStatisticService);
         }
 
-        $font = 'sans-serif';
+        $font = 'dejavusans';
         if (\array_key_exists('font', $options) && \in_array($options['font'], PdfFontType::AVAILABLE_FONTS, true)) {
             $font = $options['font'];
         }

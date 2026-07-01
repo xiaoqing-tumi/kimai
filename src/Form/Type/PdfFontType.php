@@ -18,9 +18,9 @@ final class PdfFontType extends AbstractType
     public const AVAILABLE_FONTS = [
         'times', 'serif', 'helvetica', 'sans', 'courier', 'monospace', 'mono', 'sans-serif',
         'dejavusanscondensed', 'dejavusans', 'dejavuserif', 'dejavuserifcondensed', 'dejavusansmono',
-        'freesans', 'freeserif', ' freemono',
-        // needed for: japanese + hebrew, cyrillic
-        'sun-exta', 'unbatang'
+        'freesans', 'freeserif', 'freemono',
+        // needed for: CJK (Chinese, Japanese, Korean), Hebrew, Cyrillic
+        'sun-exta', 'unbatang',
         // deactivated for now, maybe later
         // 'ocrb', 'abyssinicasil', 'aboriginalsans', 'jomolhari', 'taiheritagepro', 'aegean', 'aegyptus', 'akkadian',
         // 'quivira', 'lannaalif', 'daibannasilbook', 'garuda', 'khmeros', 'dhyana', 'tharlon',

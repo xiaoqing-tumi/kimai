@@ -55,7 +55,9 @@ export default class KimaiPaginatedBoxWidget {
         const selector = this.selector;
 
         // this event will render a spinning loader
-        document.dispatchEvent(new CustomEvent('kimai.reloadContent', {detail: this.selector}));
+        document.dispatchEvent(new CustomEvent('kimai.reloadContent', {
+            detail: {container: this.selector, local: true},
+        }));
 
         // and this event will hide it afterwards
         const hideOverlay = () => {

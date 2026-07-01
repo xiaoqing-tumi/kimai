@@ -17,7 +17,7 @@ tabler:
         logo_url: "touch-icon-192x192.png"
         theme_base: "neutral"
         theme_radius: 0.5
-        theme_primary: "blue"
+        theme_primary: "red"
 
     knp_menu:
         enable: false

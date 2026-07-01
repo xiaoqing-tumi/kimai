@@ -1,0 +1,134 @@
+/*!**********************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].oneOf[1].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[4].oneOf[1].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].oneOf[1].use[3]!./assets/sass/_invoice-pdf.scss ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************/
+/*
+ * This file is part of the Kimai time-tracking app.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+body {
+  font-family: dejavusans, sans-serif;
+  font-size: 10pt;
+  margin: 4px;
+  padding: 0;
+}
+
+table, tr, td, th, p, h1, h2, h3, h4, h5 {
+  padding: 0;
+  margin: 0;
+}
+
+th {
+  border: none;
+  text-align: left;
+}
+
+td {
+  vertical-align: top;
+}
+
+p {
+  margin-bottom: 12px;
+}
+
+.text-small {
+  font-size: 7pt;
+}
+
+.padding-left {
+  padding-left: 15px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left, .text-begin {
+  text-align: left;
+}
+
+.text-right, .text-end {
+  text-align: right;
+}
+
+.text-nowrap {
+  white-space: nowrap;
+}
+
+.date {
+  font-size: 80%;
+  text-align: right;
+  padding-top: 6px;
+}
+
+table {
+  width: 100%;
+  border-spacing: 0;
+}
+
+table.addresses, p {
+  line-height: 14pt;
+}
+
+table.addresses {
+  margin-bottom: 30px;
+}
+
+table.header {
+  padding-bottom: 4px;
+  border-bottom: 1px solid #999;
+}
+
+table.header .title {
+  font-weight: normal;
+  font-size: 140%;
+}
+
+table.footer {
+  border-top: 1px solid #999;
+  font-size: 80%;
+  padding-top: 8px;
+  line-height: 14px;
+}
+
+table.footer td {
+  vertical-align: top;
+}
+
+table.items {
+  border-collapse: collapse;
+  margin-top: 50px;
+  margin-bottom: 60px;
+}
+
+table.items thead th, table.items tbody td {
+  border-bottom: 1px solid #ccc;
+}
+
+table.items thead th.first, table.items tbody td.first {
+  padding-left: 0;
+}
+
+table.items thead th.last, table.items tbody td.last, table.items tfoot td.last {
+  padding-right: 0;
+}
+
+table.items td, table.items th {
+  padding: 8px 6px;
+}
+
+table.items tfoot td, table.items tfoot th {
+  padding: 20px 0 0 0;
+  line-height: 1px;
+}
+
+table.items tfoot td.last {
+  padding-left: 10px;
+}
+
+table.items tr.odd {
+  background-color: #f5f5f5;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW52b2ljZS1wZGYuY3NzIiwibWFwcGluZ3MiOiI7OztBQUFBOzs7OztFQUFBO0FBT0E7RUFBTztFQUFxQztFQUFpQjtFQUFhO0FBSTFFOztBQUhBO0VBQTJDO0VBQVk7QUFRdkQ7O0FBUEE7RUFBSztFQUFjO0FBWW5COztBQVhBO0VBQUs7QUFlTDs7QUFkQTtFQUFJO0FBa0JKOztBQWpCQTtFQUFjO0FBcUJkOztBQXBCQTtFQUFnQjtBQXdCaEI7O0FBdkJBO0VBQWU7QUEyQmY7O0FBMUJBO0VBQTBCO0FBOEIxQjs7QUE3QkE7RUFBeUI7QUFpQ3pCOztBQWhDQTtFQUFlO0FBb0NmOztBQW5DQTtFQUFRO0VBQWdCO0VBQW1CO0FBeUMzQzs7QUF4Q0E7RUFBUTtFQUFhO0FBNkNyQjs7QUE1Q0E7RUFBcUI7QUFnRHJCOztBQS9DQTtFQUFrQjtBQW1EbEI7O0FBbERBO0VBQWU7RUFBcUI7QUF1RHBDOztBQXREQTtFQUFzQjtFQUFxQjtBQTJEM0M7O0FBMURBO0VBQWU7RUFBNEI7RUFBZ0I7RUFBa0I7QUFpRTdFOztBQWhFQTtFQUFrQjtBQW9FbEI7O0FBbkVBO0VBQWM7RUFBMkI7RUFBa0I7QUF5RTNEOztBQXhFQTtFQUE2QztBQTRFN0M7O0FBM0VBO0VBQXlEO0FBK0V6RDs7QUE5RUE7RUFBa0Y7QUFrRmxGOztBQWpGQTtFQUFpQztBQXFGakM7O0FBcEZBO0VBQTZDO0VBQXFCO0FBeUZsRTs7QUF4RkE7RUFBNEI7QUE0RjVCOztBQTNGQTtFQUFxQjtBQStGckIsQyIsInNvdXJjZXMiOlsid2VicGFjazovL2tpbWFpLy4vYXNzZXRzL3Nhc3MvX2ludm9pY2UtcGRmLnNjc3MiXSwic291cmNlc0NvbnRlbnQiOlsiLypcclxuICogVGhpcyBmaWxlIGlzIHBhcnQgb2YgdGhlIEtpbWFpIHRpbWUtdHJhY2tpbmcgYXBwLlxyXG4gKlxyXG4gKiBGb3IgdGhlIGZ1bGwgY29weXJpZ2h0IGFuZCBsaWNlbnNlIGluZm9ybWF0aW9uLCBwbGVhc2UgdmlldyB0aGUgTElDRU5TRVxyXG4gKiBmaWxlIHRoYXQgd2FzIGRpc3RyaWJ1dGVkIHdpdGggdGhpcyBzb3VyY2UgY29kZS5cclxuICovXHJcblxyXG5ib2R5IHsgZm9udC1mYW1pbHk6IGRlamF2dXNhbnMsIHNhbnMtc2VyaWY7IGZvbnQtc2l6ZTogMTBwdDsgbWFyZ2luOiA0cHg7IHBhZGRpbmc6IDA7IH1cclxudGFibGUsIHRyLCB0ZCwgdGgsIHAsIGgxLCBoMiwgaDMsIGg0LCBoNSB7IHBhZGRpbmc6IDA7IG1hcmdpbjogMDt9XHJcbnRoIHsgYm9yZGVyOiBub25lOyB0ZXh0LWFsaWduOiBsZWZ0OyB9XHJcbnRkIHsgdmVydGljYWwtYWxpZ246IHRvcDsgfVxyXG5wIHsgbWFyZ2luLWJvdHRvbTogMTJweDsgfVxyXG4udGV4dC1zbWFsbCB7IGZvbnQtc2l6ZTogN3B0OyB9XHJcbi5wYWRkaW5nLWxlZnQgeyBwYWRkaW5nLWxlZnQ6IDE1cHg7IH1cclxuLnRleHQtY2VudGVyIHsgdGV4dC1hbGlnbjogY2VudGVyOyB9XHJcbi50ZXh0LWxlZnQsIC50ZXh0LWJlZ2luIHsgdGV4dC1hbGlnbjogbGVmdDsgfVxyXG4udGV4dC1yaWdodCwgLnRleHQtZW5kIHsgdGV4dC1hbGlnbjogcmlnaHQ7IH1cclxuLnRleHQtbm93cmFwIHsgd2hpdGUtc3BhY2U6IG5vd3JhcDsgfVxyXG4uZGF0ZSB7IGZvbnQtc2l6ZTogODAlOyB0ZXh0LWFsaWduOiByaWdodDsgcGFkZGluZy10b3A6IDZweDsgfVxyXG50YWJsZSB7IHdpZHRoOiAxMDAlOyBib3JkZXItc3BhY2luZzogMDsgfVxyXG50YWJsZS5hZGRyZXNzZXMsIHAgeyBsaW5lLWhlaWdodDogMTRwdDsgfVxyXG50YWJsZS5hZGRyZXNzZXMgeyBtYXJnaW4tYm90dG9tOiAzMHB4OyB9XHJcbnRhYmxlLmhlYWRlciB7IHBhZGRpbmctYm90dG9tOiA0cHg7IGJvcmRlci1ib3R0b206IDFweCBzb2xpZCAjOTk5OyB9XHJcbnRhYmxlLmhlYWRlciAudGl0bGUgeyBmb250LXdlaWdodDogbm9ybWFsOyBmb250LXNpemU6IDE0MCU7IH1cclxudGFibGUuZm9vdGVyIHsgYm9yZGVyLXRvcDogMXB4IHNvbGlkICM5OTk7IGZvbnQtc2l6ZTogODAlOyBwYWRkaW5nLXRvcDogOHB4OyBsaW5lLWhlaWdodDogMTRweDsgfVxyXG50YWJsZS5mb290ZXIgdGQgeyB2ZXJ0aWNhbC1hbGlnbjogdG9wOyB9XHJcbnRhYmxlLml0ZW1zIHsgYm9yZGVyLWNvbGxhcHNlOiBjb2xsYXBzZTsgbWFyZ2luLXRvcDogNTBweDsgbWFyZ2luLWJvdHRvbTogNjBweDsgfVxyXG50YWJsZS5pdGVtcyB0aGVhZCB0aCwgdGFibGUuaXRlbXMgdGJvZHkgdGQgeyBib3JkZXItYm90dG9tOiAxcHggc29saWQgI2NjYzsgfVxyXG50YWJsZS5pdGVtcyB0aGVhZCB0aC5maXJzdCwgdGFibGUuaXRlbXMgdGJvZHkgdGQuZmlyc3QgeyBwYWRkaW5nLWxlZnQ6IDA7IH1cclxudGFibGUuaXRlbXMgdGhlYWQgdGgubGFzdCwgdGFibGUuaXRlbXMgdGJvZHkgdGQubGFzdCwgdGFibGUuaXRlbXMgdGZvb3QgdGQubGFzdCB7IHBhZGRpbmctcmlnaHQ6IDA7IH1cclxudGFibGUuaXRlbXMgdGQsIHRhYmxlLml0ZW1zIHRoIHsgcGFkZGluZzogOHB4IDZweDsgfVxyXG50YWJsZS5pdGVtcyB0Zm9vdCB0ZCwgdGFibGUuaXRlbXMgdGZvb3QgdGggeyBwYWRkaW5nOiAyMHB4IDAgMCAwOyBsaW5lLWhlaWdodDogMXB4OyB9XHJcbnRhYmxlLml0ZW1zIHRmb290IHRkLmxhc3QgeyBwYWRkaW5nLWxlZnQ6IDEwcHg7IH1cclxudGFibGUuaXRlbXMgdHIub2RkIHsgYmFja2dyb3VuZC1jb2xvcjogI2Y1ZjVmNTsgfVxyXG4iXSwibmFtZXMiOltdLCJzb3VyY2VSb290IjoiIn0=*/

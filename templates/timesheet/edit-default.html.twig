@@ -49,6 +49,17 @@
             {% if form.break is defined %}
                 {{ form_row(form.break, {'row_attr': {'class': 'mb-3 ' ~ form.vars.name ~ '_row_' ~ form.break.vars.name}}) }}
             {% endif %}
+            {% if form.duration is defined and form.begin_date is defined %}
+                <div class="mb-3 row">
+                    <label class="col-form-label col-sm-2">{{ 'shift.apply'|trans }}</label>
+                    <div class="col-sm-10">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-primary apply-shift-day" data-shift="A" data-form-prefix="{{ form.vars.name }}">{{ 'shift.apply_a'|trans }}</button>
+                            <button type="button" class="btn btn-outline-primary apply-shift-day" data-shift="B" data-form-prefix="{{ form.vars.name }}">{{ 'shift.apply_b'|trans }}</button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             {% if form.customer is defined %}
                 {{ form_row(form.customer, {'row_attr': {'class': 'mb-3 ' ~ form.vars.name ~ '_row_' ~ form.customer.vars.name}}) }}
             {% endif %}

@@ -1,0 +1,78 @@
+/*!*********************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[4].oneOf[1].use[1]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[4].oneOf[1].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[4].oneOf[1].use[3]!./assets/sass/_export-pdf.scss ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************/
+/*
+ * This file is part of the Kimai time-tracking app.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+body {
+  font-family: dejavusans, sans-serif;
+  font-size: 10pt;
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  margin: 0;
+}
+
+table.items {
+  border: 0.1mm solid #000000;
+  width: 100%;
+  font-size: 9pt;
+  border-collapse: collapse;
+}
+
+td, th {
+  padding: 7px;
+}
+
+td {
+  vertical-align: top;
+}
+
+.items td {
+  border-left: 0.1mm solid #000000;
+  border-right: 0.1mm solid #000000;
+}
+
+.items tr.even {
+  background-color: #f5f5f5;
+}
+
+.items tr.summary {
+  background-color: #efefef;
+}
+
+.items tr.summary td {
+  font-weight: bold;
+  border-top: 0.1mm solid #000000;
+  border-bottom: 0.1mm solid #000000;
+}
+
+table thead th {
+  background-color: #ececec;
+  border: 0.1mm solid #000000;
+  font-weight: bold;
+  font-size: 10pt;
+  text-align: left;
+}
+
+.items td.totals {
+  font-weight: bold;
+  border: 0.1mm solid #000000;
+}
+
+.items .center,
+.items td.duration,
+.items td.cost {
+  text-align: center;
+}
+
+.text-nowrap {
+  white-space: nowrap;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZXhwb3J0LXBkZi5jc3MiLCJtYXBwaW5ncyI6Ijs7O0FBQUE7Ozs7O0VBQUE7QUFPQTtFQUNJO0VBQ0E7RUFDQTtFQUNBO0FBQUo7O0FBRUE7RUFDSTtBQUNKOztBQUNBO0VBQ0k7RUFDQTtFQUNBO0VBQ0E7QUFFSjs7QUFBQTtFQUNJO0FBR0o7O0FBREE7RUFDSTtBQUlKOztBQUZBO0VBQ0k7RUFDQTtBQUtKOztBQUhBO0VBQ0k7QUFNSjs7QUFKQTtFQUNJO0FBT0o7O0FBTEE7RUFDSTtFQUNBO0VBQ0E7QUFRSjs7QUFOQTtFQUNJO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7QUFTSjs7QUFQQTtFQUNJO0VBQ0E7QUFVSjs7QUFSQTs7O0VBR0k7QUFXSjs7QUFUQTtFQUNJO0FBWUosQyIsInNvdXJjZXMiOlsid2VicGFjazovL2tpbWFpLy4vYXNzZXRzL3Nhc3MvX2V4cG9ydC1wZGYuc2NzcyJdLCJzb3VyY2VzQ29udGVudCI6WyIvKlxyXG4gKiBUaGlzIGZpbGUgaXMgcGFydCBvZiB0aGUgS2ltYWkgdGltZS10cmFja2luZyBhcHAuXHJcbiAqXHJcbiAqIEZvciB0aGUgZnVsbCBjb3B5cmlnaHQgYW5kIGxpY2Vuc2UgaW5mb3JtYXRpb24sIHBsZWFzZSB2aWV3IHRoZSBMSUNFTlNFXHJcbiAqIGZpbGUgdGhhdCB3YXMgZGlzdHJpYnV0ZWQgd2l0aCB0aGlzIHNvdXJjZSBjb2RlLlxyXG4gKi9cclxuXHJcbmJvZHkge1xyXG4gICAgZm9udC1mYW1pbHk6IGRlamF2dXNhbnMsIHNhbnMtc2VyaWY7XHJcbiAgICBmb250LXNpemU6IDEwcHQ7XHJcbiAgICBtYXJnaW46IDA7XHJcbiAgICBwYWRkaW5nOiAwO1xyXG59XHJcbnAge1xyXG4gICAgbWFyZ2luOiAwO1xyXG59XHJcbnRhYmxlLml0ZW1zIHtcclxuICAgIGJvcmRlcjogMC4xbW0gc29saWQgIzAwMDAwMDtcclxuICAgIHdpZHRoOiAxMDAlO1xyXG4gICAgZm9udC1zaXplOiA5cHQ7XHJcbiAgICBib3JkZXItY29sbGFwc2U6IGNvbGxhcHNlO1xyXG59XHJcbnRkLCB0aCB7XHJcbiAgICBwYWRkaW5nOiA3cHg7XHJcbn1cclxudGQge1xyXG4gICAgdmVydGljYWwtYWxpZ246IHRvcDtcclxufVxyXG4uaXRlbXMgdGQge1xyXG4gICAgYm9yZGVyLWxlZnQ6IDAuMW1tIHNvbGlkICMwMDAwMDA7XHJcbiAgICBib3JkZXItcmlnaHQ6IDAuMW1tIHNvbGlkICMwMDAwMDA7XHJcbn1cclxuLml0ZW1zIHRyLmV2ZW4ge1xyXG4gICAgYmFja2dyb3VuZC1jb2xvcjogI2Y1ZjVmNTtcclxufVxyXG4uaXRlbXMgdHIuc3VtbWFyeSB7XHJcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjZWZlZmVmO1xyXG59XHJcbi5pdGVtcyB0ci5zdW1tYXJ5IHRkIHtcclxuICAgIGZvbnQtd2VpZ2h0OiBib2xkO1xyXG4gICAgYm9yZGVyLXRvcDogMC4xbW0gc29saWQgIzAwMDAwMDtcclxuICAgIGJvcmRlci1ib3R0b206IDAuMW1tIHNvbGlkICMwMDAwMDA7XHJcbn1cclxudGFibGUgdGhlYWQgdGgge1xyXG4gICAgYmFja2dyb3VuZC1jb2xvcjogI2VjZWNlYztcclxuICAgIGJvcmRlcjogMC4xbW0gc29saWQgIzAwMDAwMDtcclxuICAgIGZvbnQtd2VpZ2h0OiBib2xkO1xyXG4gICAgZm9udC1zaXplOiAxMHB0O1xyXG4gICAgdGV4dC1hbGlnbjogbGVmdDtcclxufVxyXG4uaXRlbXMgdGQudG90YWxzIHtcclxuICAgIGZvbnQtd2VpZ2h0OiBib2xkO1xyXG4gICAgYm9yZGVyOiAwLjFtbSBzb2xpZCAjMDAwMDAwO1xyXG59XHJcbi5pdGVtcyAuY2VudGVyLFxyXG4uaXRlbXMgdGQuZHVyYXRpb24sXHJcbi5pdGVtcyB0ZC5jb3N0IHtcclxuICAgIHRleHQtYWxpZ246IGNlbnRlcjtcclxufVxyXG4udGV4dC1ub3dyYXAge1xyXG4gICAgd2hpdGUtc3BhY2U6IG5vd3JhcDtcclxufVxyXG4iXSwibmFtZXMiOltdLCJzb3VyY2VSb290IjoiIn0=*/

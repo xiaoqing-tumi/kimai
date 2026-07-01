@@ -1038,6 +1038,82 @@
         <source>quick_entry.title</source>
         <target>每周工作时间</target>
       </trans-unit>
+      <trans-unit id="att001" resname="attendance.title">
+        <source>attendance.title</source>
+        <target>考勤记录</target>
+      </trans-unit>
+      <trans-unit id="att002" resname="attendance.help">
+        <source>attendance.help</source>
+        <target>来自外部系统的打卡数据。用于判定 A 班（9:00 前到岗）或 B 班（9:00 及之后到岗）。</target>
+      </trans-unit>
+      <trans-unit id="att003" resname="attendance.clock_in">
+        <source>attendance.clock_in</source>
+        <target>上班打卡</target>
+      </trans-unit>
+      <trans-unit id="att004" resname="attendance.clock_out">
+        <source>attendance.clock_out</source>
+        <target>下班打卡</target>
+      </trans-unit>
+      <trans-unit id="att005" resname="attendance.shift">
+        <source>attendance.shift</source>
+        <target>班次</target>
+      </trans-unit>
+      <trans-unit id="att006" resname="attendance.source">
+        <source>attendance.source</source>
+        <target>数据来源</target>
+      </trans-unit>
+      <trans-unit id="att007" resname="attendance.synced_at">
+        <source>attendance.synced_at</source>
+        <target>同步时间</target>
+      </trans-unit>
+      <trans-unit id="att008" resname="attendance.empty">
+        <source>attendance.empty</source>
+        <target>本周暂无考勤记录。</target>
+      </trans-unit>
+      <trans-unit id="shf001" resname="shift.label">
+        <source>shift.label</source>
+        <target>班次</target>
+      </trans-unit>
+      <trans-unit id="shf002" resname="shift.a">
+        <source>shift.a</source>
+        <target>A 班（9:00–18:00）</target>
+      </trans-unit>
+      <trans-unit id="shf003" resname="shift.b">
+        <source>shift.b</source>
+        <target>B 班（9:30–18:30）</target>
+      </trans-unit>
+      <trans-unit id="shf008" resname="shift.name_a">
+        <source>shift.name_a</source>
+        <target>A 班</target>
+      </trans-unit>
+      <trans-unit id="shf009" resname="shift.name_b">
+        <source>shift.name_b</source>
+        <target>B 班</target>
+      </trans-unit>
+      <trans-unit id="shf010" resname="shift.hours_a">
+        <source>shift.hours_a</source>
+        <target>9:00–18:00</target>
+      </trans-unit>
+      <trans-unit id="shf011" resname="shift.hours_b">
+        <source>shift.hours_b</source>
+        <target>9:30–18:30</target>
+      </trans-unit>
+      <trans-unit id="shf004" resname="shift.apply">
+        <source>shift.apply</source>
+        <target>套用班次模板</target>
+      </trans-unit>
+      <trans-unit id="shf005" resname="shift.apply_a">
+        <source>shift.apply_a</source>
+        <target>全天 A 班</target>
+      </trans-unit>
+      <trans-unit id="shf006" resname="shift.apply_b">
+        <source>shift.apply_b</source>
+        <target>全天 B 班</target>
+      </trans-unit>
+      <trans-unit id="shf007" resname="default_shift">
+        <source>default_shift</source>
+        <target>默认班次（无考勤数据时使用）</target>
+      </trans-unit>
       <trans-unit id="HPhRbtc" resname="stats.workingTimeWeekShort">
         <source>stats.workingTimeWeekShort</source>
         <target>周 %week%</target>
@@ -1256,7 +1332,7 @@
       </trans-unit>
       <trans-unit id="wwrREDg" resname="pagination">
         <source>pagination</source>
-        <target state="translated">显示从 %total% 到 %start% 到 %end% 的条目。</target>
+        <target state="translated">显示第 %start% 至 %end% 条，共 %total% 条。</target>
       </trans-unit>
       <trans-unit id="BjyLITj" resname="stats.userDurationYear">
         <source>stats.userDurationYear</source>

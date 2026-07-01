@@ -352,6 +352,24 @@ final class SystemConfigurationController extends AbstractController
                         ->setConstraints([
                             new GreaterThanOrEqual(['value' => 0])
                         ]),
+                    (new Configuration('timesheet.rules.max_hours_per_day'))
+                        ->setType(IntegerType::class)
+                        ->setTranslationDomain('system-configuration')
+                        ->setConstraints([
+                            new GreaterThanOrEqual(['value' => 0])
+                        ]),
+                    (new Configuration('timesheet.rules.max_hours_weekend'))
+                        ->setType(IntegerType::class)
+                        ->setTranslationDomain('system-configuration')
+                        ->setConstraints([
+                            new GreaterThanOrEqual(['value' => 0])
+                        ]),
+                    (new Configuration('timesheet.rules.shift_lunch_break_seconds'))
+                        ->setType(IntegerType::class)
+                        ->setTranslationDomain('system-configuration')
+                        ->setConstraints([
+                            new GreaterThanOrEqual(['value' => 0])
+                        ]),
                     (new Configuration('timesheet.rules.break_time_active'))
                         ->setLabel('break')
                         ->setType(YesNoType::class)

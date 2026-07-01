@@ -45,6 +45,10 @@ export default class KimaiAutocomplete extends KimaiFormTomselectPlugin {
     activateForm(form)
     {
         [].slice.call(form.querySelectorAll(this.selector)).map((node) => {
+            if (node.tomselect !== undefined && node.tomselect !== null) {
+                return;
+            }
+
             const apiUrl = node.dataset['autocompleteUrl'];
             let minChars = 3;
             if (node.dataset['minimumCharacter'] !== undefined) {

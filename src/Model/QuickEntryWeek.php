@@ -51,6 +51,17 @@ class QuickEntryWeek
         return \count($this->rows);
     }
 
+    public function hasRowsWithExistingTimesheets(): bool
+    {
+        foreach ($this->rows as $row) {
+            if ($row->hasExistingTimesheet()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @return QuickEntryModel[]
      */

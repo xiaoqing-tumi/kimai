@@ -55,7 +55,7 @@ final class ProjectSubscriber extends AbstractActionsSubscriber
             $dateRange = $payload['daterange'];
         }
 
-        if ($this->isGranted('view_activity')) {
+        if ($this->isGranted('view_activity') && $this->isGranted('listing', 'activity')) {
             $event->addActionToSubmenu('filter', 'activity', ['title' => 'activities', 'url' => $this->path('admin_activity', ['customers[]' => $customer->getId(), 'projects[]' => $project->getId()])]);
         }
 
@@ -72,7 +72,7 @@ final class ProjectSubscriber extends AbstractActionsSubscriber
         }
 
         if ($isListingView) {
-            if ($project->isVisible() && $customer->isVisible() && $this->isGranted('create_activity')) {
+            if ($project->isVisible() && $customer->isVisible() && $this->isGranted('create_activity') && $this->isGranted('edit', $project)) {
                 $event->addAction('create-activity', [
                     'icon' => 'create',
                     'url' => $this->path('admin_activity_create_with_project', ['project' => $project->getId()]),

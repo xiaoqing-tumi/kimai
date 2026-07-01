@@ -36,10 +36,12 @@
 {% endif %}
 <html{% if app.request is defined and app.request is not null %} lang="{{ app.request.locale }}"{% endif %}>
 <head>
+    <meta charset="utf-8">
     <title>{% block document_title %}{{ 'export'|trans }}{% endblock %}</title>
 {% block styles %}
     <style>
         {{ encore_entry_css_source('export-pdf')|raw }}
+        body { font-family: dejavusans, sans-serif !important; }
     </style>
 {% endblock %}
 </head>

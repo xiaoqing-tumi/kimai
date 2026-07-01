@@ -90,7 +90,7 @@ class PdfTemplateRendererTest extends AbstractRendererTestCase
             self::assertArrayHasKey('entries', $options);
             self::assertArrayHasKey('query', $options);
 
-            self::assertEquals('sans-serif', $options['font']);
+            self::assertEquals('dejavusans', $options['font']);
             self::assertEquals([
                 'date',
                 'begin',

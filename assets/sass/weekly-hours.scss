@@ -1,13 +1,12 @@
 /*
- * This file is part of the Kimai time-tracking app.
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * Weekly working hours (quick entry) form
  */
 
-/* This file contains rules for the "weekly-hours" AKA "quick-entries" form */
-
 .quick-entry-page {
+    --qe-shift-a-bg: var(--kimai-brand-lt);
+    --qe-shift-a-color: var(--kimai-brand);
+    --qe-shift-b-bg: var(--kimai-accent-lt);
+    --qe-shift-b-color: var(--kimai-accent);
 
     .form-dataTable {
         table.dataTable {
@@ -17,8 +16,200 @@
         }
     }
 
-    #quick_entry_form {
-        display: none;
+    #quick_entry_box {
+        .card-header {
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .card-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.25rem;
+            border-top: 1px solid var(--tblr-border-color);
+            background-color: var(--tblr-bg-surface-secondary);
+        }
+
+        .qe-table-scroll {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .table.dataTable.qe-week-table {
+            margin-bottom: 0;
+            width: 100%;
+
+            thead th {
+                font-size: 0.8125rem;
+                font-weight: 600;
+                color: var(--tblr-secondary);
+                background-color: var(--tblr-bg-surface-secondary);
+                border-bottom-width: 1px;
+                vertical-align: middle;
+                padding: 0.625rem 0.5rem;
+            }
+
+            tbody td,
+            tfoot td {
+                vertical-align: middle;
+            }
+
+            tbody td:not(.total) {
+                padding: 0.375rem 0.5rem;
+            }
+
+            th.qe-actions-header,
+            td.qe-actions-cell,
+            td.qe-actions-footer {
+                width: 3rem;
+                min-width: 3rem;
+                padding: 0.375rem 0.25rem;
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            tr.summary td {
+                background-color: rgba(var(--kimai-brand-rgb), 0.08);
+                color: var(--tblr-body-color);
+                font-weight: 600;
+                border-top: 1px solid var(--tblr-border-color);
+            }
+
+            th.weekend,
+            td.weekend {
+                background-color: var(--tblr-bg-surface-tertiary);
+            }
+
+            th.today,
+            td.today {
+                background-color: var(--qe-shift-a-bg);
+                --tblr-table-bg: var(--qe-shift-a-bg);
+            }
+
+            td.qe-day-total.text-danger {
+                color: var(--tblr-danger) !important;
+            }
+        }
+
+        .duration-widget {
+            position: relative;
+
+            .input-group {
+                min-width: 5.5rem;
+                width: auto;
+            }
+
+            .btn-duration-preset {
+                display: flex;
+                min-width: 1.75rem;
+                padding-left: 0.375rem;
+                padding-right: 0.375rem;
+            }
+
+            input.duration-input {
+                padding: 0.4375rem 0.3125rem;
+                min-width: 2.75rem;
+                flex: 1 1 auto;
+                text-align: center;
+                font-size: 0.8125rem;
+                border-color: var(--tblr-border-color);
+                border-bottom-right-radius: 0;
+                border-top-right-radius: 0;
+
+                &:focus {
+                    border-color: var(--kimai-brand);
+                    box-shadow: 0 0 0 0.2rem rgba(var(--kimai-brand-rgb), 0.15);
+                }
+            }
+
+            .dropdown-menu {
+                z-index: 1056;
+            }
+        }
+
+        td:has(.duration-widget) {
+            min-width: 5.5rem;
+        }
+    }
+
+    .qe-shift-selector {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .qe-shift-btn {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.125rem;
+        min-width: 6.5rem;
+        padding: 0.4375rem 0.75rem;
+        border-radius: var(--tblr-border-radius);
+        border: 1px solid var(--tblr-border-color);
+        background-color: var(--tblr-bg-surface);
+        color: var(--tblr-body-color);
+        text-decoration: none;
+        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+        &:hover {
+            text-decoration: none;
+            border-color: rgba(var(--kimai-brand-rgb), 0.35);
+            background-color: var(--tblr-bg-surface-secondary);
+        }
+
+        &__label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        &__time {
+            font-size: 0.75rem;
+            line-height: 1.2;
+            opacity: 0.8;
+        }
+
+        &--a .qe-shift-btn__label {
+            color: var(--qe-shift-a-color);
+        }
+
+        &--b .qe-shift-btn__label {
+            color: var(--qe-shift-b-color);
+        }
+
+        &.is-active {
+            border-color: transparent;
+            color: #fff;
+
+            .qe-shift-btn__label,
+            .qe-shift-btn__time {
+                color: inherit;
+                opacity: 1;
+            }
+        }
+
+        &--a.is-active {
+            background-color: var(--qe-shift-a-color);
+            box-shadow: 0 1px 2px rgba(var(--kimai-brand-rgb), 0.25);
+        }
+
+        &--b.is-active {
+            background-color: var(--qe-shift-b-color);
+            box-shadow: 0 1px 2px rgba(var(--tblr-orange-rgb), 0.25);
+        }
+    }
+
+    .qe-footer-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.625rem;
+        width: 100%;
+        margin: 0;
     }
 
     .ts-wrapper {
@@ -28,43 +219,21 @@
 
         .ts-control {
             white-space: nowrap;
+            border-color: var(--tblr-border-color);
+
             .item {
                 overflow: hidden;
             }
         }
-    }
 
-    .table tbody td:not(.total) {
-        padding: 3px;
-    }
-
-    .duration-widget input.duration-input {
-        min-width: 40px;
-    }
-
-    /* make the duration field and dropdown smaller */
-    #quick_entry_box {
-        .duration-widget {
-            .input-group {
-                max-width: 50px;
-                min-width: 50px;
-            }
-            .btn-duration-preset {
-                display: none;
-                min-width: 30px;
-            }
-            input.duration-input {
-                padding: 7px 5px;
-                max-width: 50px;
-                border-bottom-right-radius: var(--tblr-border-radius);
-                border-top-right-radius: var(--tblr-border-radius);
-            }
+        &.focus .ts-control {
+            border-color: var(--kimai-brand);
+            box-shadow: 0 0 0 0.2rem rgba(var(--kimai-brand-rgb), 0.15);
         }
     }
 
-    /* make sure dropdown never hides behind table responsive */
-    .dropdown-menu {
-        z-index: 1056;
+    .duration-widget input.duration-input {
+        min-width: 2.75rem;
     }
 }
 
@@ -79,7 +248,7 @@
 @media (min-width: 992px) {
     .quick-entry-page {
         .ts-wrapper {
-            max-width: 100px;
+            max-width: 150px;
         }
     }
 }
@@ -97,28 +266,9 @@
         .ts-wrapper {
             max-width: 165px;
         }
+
         .duration-widget {
             max-width: 100%;
-        }
-    }
-}
-
-@media (min-width: 1250px) {
-    .quick-entry-page {
-        #quick_entry_box {
-            .duration-widget {
-                .input-group {
-                    max-width: 85px;
-                    min-width: 75px;
-                }
-                .btn-duration-preset {
-                    display: flex;
-                }
-                input.duration-input {
-                    border-bottom-right-radius: 0;
-                    border-top-right-radius: 0;
-                }
-            }
         }
     }
 }
@@ -132,6 +282,7 @@
                 }
             }
         }
+
         .ts-wrapper {
             max-width: 190px;
         }
@@ -167,6 +318,7 @@
         .ts-wrapper {
             max-width: 450px;
         }
+
         #quick_entry_box {
             .duration-widget {
                 .input-group {

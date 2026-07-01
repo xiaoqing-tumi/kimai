@@ -1486,6 +1486,82 @@
         <source>quick_entry.title</source>
         <target>Weekly hours</target>
       </trans-unit>
+      <trans-unit id="att001" resname="attendance.title">
+        <source>attendance.title</source>
+        <target>Attendance records</target>
+      </trans-unit>
+      <trans-unit id="att002" resname="attendance.help">
+        <source>attendance.help</source>
+        <target>Clock-in data imported from external systems. Used to determine shift A (before 9:00) or B (from 9:00).</target>
+      </trans-unit>
+      <trans-unit id="att003" resname="attendance.clock_in">
+        <source>attendance.clock_in</source>
+        <target>Clock in</target>
+      </trans-unit>
+      <trans-unit id="att004" resname="attendance.clock_out">
+        <source>attendance.clock_out</source>
+        <target>Clock out</target>
+      </trans-unit>
+      <trans-unit id="att005" resname="attendance.shift">
+        <source>attendance.shift</source>
+        <target>Shift</target>
+      </trans-unit>
+      <trans-unit id="att006" resname="attendance.source">
+        <source>attendance.source</source>
+        <target>Source</target>
+      </trans-unit>
+      <trans-unit id="att007" resname="attendance.synced_at">
+        <source>attendance.synced_at</source>
+        <target>Synced at</target>
+      </trans-unit>
+      <trans-unit id="att008" resname="attendance.empty">
+        <source>attendance.empty</source>
+        <target>No attendance records for this week.</target>
+      </trans-unit>
+      <trans-unit id="shf001" resname="shift.label">
+        <source>shift.label</source>
+        <target>Shift</target>
+      </trans-unit>
+      <trans-unit id="shf002" resname="shift.a">
+        <source>shift.a</source>
+        <target>Shift A (9:00–18:00)</target>
+      </trans-unit>
+      <trans-unit id="shf003" resname="shift.b">
+        <source>shift.b</source>
+        <target>Shift B (9:30–18:30)</target>
+      </trans-unit>
+      <trans-unit id="shf008" resname="shift.name_a">
+        <source>shift.name_a</source>
+        <target>Shift A</target>
+      </trans-unit>
+      <trans-unit id="shf009" resname="shift.name_b">
+        <source>shift.name_b</source>
+        <target>Shift B</target>
+      </trans-unit>
+      <trans-unit id="shf010" resname="shift.hours_a">
+        <source>shift.hours_a</source>
+        <target>9:00–18:00</target>
+      </trans-unit>
+      <trans-unit id="shf011" resname="shift.hours_b">
+        <source>shift.hours_b</source>
+        <target>9:30–18:30</target>
+      </trans-unit>
+      <trans-unit id="shf004" resname="shift.apply">
+        <source>shift.apply</source>
+        <target>Apply shift template</target>
+      </trans-unit>
+      <trans-unit id="shf005" resname="shift.apply_a">
+        <source>shift.apply_a</source>
+        <target>Full day shift A</target>
+      </trans-unit>
+      <trans-unit id="shf006" resname="shift.apply_b">
+        <source>shift.apply_b</source>
+        <target>Full day shift B</target>
+      </trans-unit>
+      <trans-unit id="shf007" resname="default_shift">
+        <source>default_shift</source>
+        <target>Default shift (when no attendance data)</target>
+      </trans-unit>
       <trans-unit id="IPHM4iP" resname="updated_at">
         <source>Updated at</source>
         <target>Updated at</target>

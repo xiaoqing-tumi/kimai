@@ -63,7 +63,14 @@ class UserService
         $user->setRoles([User::DEFAULT_ROLE]);
         $user->setTimezone($this->configuration->getUserDefaultTimezone());
         $user->setLanguage($this->configuration->getUserDefaultLanguage());
+        $user->setLocale($this->configuration->getUserDefaultLanguage());
         $user->setPreferenceValue(UserPreference::SKIN, $this->configuration->getUserDefaultTheme());
+
+        if (!$this->configuration->isUserWizardActive()) {
+            foreach (User::WIZARDS as $wizard) {
+                $user->setWizardAsSeen($wizard);
+            }
+        }
 
         // Attention: PrepareUserEvent cannot be dispatched on console, as it calls isGranted()
         $this->dispatcher->dispatch(new UserCreateEvent($user));

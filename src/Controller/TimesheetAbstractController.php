@@ -241,36 +241,91 @@ abstract class TimesheetAbstractController extends AbstractController
             throw $this->createNotFoundException();
         }
 
+        $timesheetIds = $this->extractTimesheetIdsFromRequest($request);
+
         $query = $this->createDefaultQuery();
         $query->setOrder(BaseQuery::ORDER_ASC);
 
-        $form = $this->getToolbarForm($query);
-        $request->query->set('performSearch', true);
+        if (\count($timesheetIds) > 0) {
+            $this->prepareQuery($query);
+            $query->setTimesheetIds($timesheetIds);
+        } else {
+            $form = $this->getToolbarForm($query);
+            $request->query->set('performSearch', true);
 
-        if ($this->handleSearch($form, $request)) {
-            return $this->redirectToRoute($this->getTimesheetRoute());
-        }
+            if ($this->handleSearch($form, $request)) {
+                return $this->redirectToRoute($this->getTimesheetRoute());
+            }
 
-        $this->prepareQuery($query);
+            $this->prepareQuery($query);
 
-        // make sure that we use the "expected time range"
-        if (null !== $query->getBegin()) {
-            $query->getBegin()->setTime(0, 0, 0);
-        }
-        if (null !== $query->getEnd()) {
-            $query->getEnd()->setTime(23, 59, 59);
+            // make sure that we use the "expected time range"
+            if (null !== $query->getBegin()) {
+                $query->getBegin()->setTime(0, 0, 0);
+            }
+            if (null !== $query->getEnd()) {
+                $query->getEnd()->setTime(23, 59, 59);
+            }
         }
 
         $entries = $this->repository->getTimesheetResult($query);
+        $results = $entries->getResults();
+        $this->applyExportPeriodFromEntries($query, $results);
 
         $oldMaxExecTime = \ini_get('max_execution_time');
         ini_set('max_execution_time', $this->configuration->getExportTimeout());
 
-        $response = $exporter->render($entries->getResults(), $query);
+        $response = $exporter->render($results, $query);
 
         ini_set('max_execution_time', $oldMaxExecTime);
 
         return $response;
+    }
+
+    /**
+     * @return array<int>
+     */
+    private function extractTimesheetIdsFromRequest(Request $request): array
+    {
+        $ids = $request->query->all('timesheets');
+        if (\count($ids) === 0) {
+            $ids = $request->request->all('timesheets');
+        }
+
+        return array_values(array_unique(array_filter(array_map(static fn ($id) => is_numeric($id) ? (int) $id : 0, $ids), static fn (int $id) => $id > 0)));
+    }
+
+    /**
+     * @param Timesheet[] $entries
+     */
+    private function applyExportPeriodFromEntries(TimesheetQuery $query, array $entries): void
+    {
+        if (\count($entries) === 0) {
+            return;
+        }
+
+        $begin = null;
+        $end = null;
+
+        foreach ($entries as $entry) {
+            $entryBegin = $entry->getBegin();
+            if ($entryBegin !== null && ($begin === null || $entryBegin < $begin)) {
+                $begin = $entryBegin;
+            }
+
+            $entryEnd = $entry->getEnd() ?? $entryBegin;
+            if ($entryEnd !== null && ($end === null || $entryEnd > $end)) {
+                $end = $entryEnd;
+            }
+        }
+
+        if ($query->getBegin() === null && $begin !== null) {
+            $query->setBegin($begin);
+        }
+
+        if ($query->getEnd() === null && $end !== null) {
+            $query->setEnd($end);
+        }
     }
 
     protected function multiUpdate(Request $request): Response

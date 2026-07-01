@@ -9,6 +9,7 @@
 
 namespace App\Controller;
 
+use App\Timesheet\Shift\ShiftResolver;
 use App\Configuration\SystemConfiguration;
 use App\Event\QuickEntryMetaDisplayEvent;
 use App\Form\QuickEntryForm;
@@ -17,6 +18,7 @@ use App\Model\QuickEntryWeek;
 use App\Reporting\WeekByUser\WeekByUser;
 use App\Repository\Query\TimesheetQuery;
 use App\Repository\TimesheetRepository;
+use App\Repository\UserRepository;
 use App\Timesheet\FavoriteRecordService;
 use App\Timesheet\TimesheetService;
 use App\Utils\PageSetup;
@@ -40,6 +42,7 @@ final class QuickEntryController extends AbstractController
         private readonly FavoriteRecordService $favoriteRecordService,
         private readonly EventDispatcherInterface $dispatcher,
         private readonly WorkingTimeService $workingTimeService,
+        private readonly UserRepository $userRepository,
     )
     {
     }
@@ -66,6 +69,12 @@ final class QuickEntryController extends AbstractController
 
         $user = $values->getUser() ?? $user;
         $factory = $this->getDateTimeFactory($user);
+
+        $shiftParam = $request->query->get('shift');
+        if ($shiftParam === 'A' || $shiftParam === 'B') {
+            $user->setPreferenceValue(ShiftResolver::USER_PREFERENCE_DEFAULT_SHIFT, $shiftParam);
+            $this->userRepository->saveUser($user);
+        }
 
         $begin = $values->getDate();
 
@@ -206,9 +215,9 @@ final class QuickEntryController extends AbstractController
             $empty->addTimesheet($tmp);
         }
 
-        // add empty rows for simpler starting
+        // add empty rows for simpler starting, but only before the user has saved timesheets for this week
         $minRows = \intval($this->configuration->find('quick_entry.minimum_rows'));
-        if (!$locked && $formModel->countRows() < $minRows) {
+        if (!$locked && !$formModel->hasRowsWithExistingTimesheets() && $formModel->countRows() < $minRows) {
             $newRows = $minRows - $formModel->countRows();
             for ($a = 0; $a < $newRows; $a++) {
                 $model = $formModel->addRow($user);
@@ -305,6 +314,9 @@ final class QuickEntryController extends AbstractController
             'form' => $form->createView(),
             'metaColumns' => $metaFields,
             'locked' => $locked,
+            'default_shift' => $user->getPreferenceValue(ShiftResolver::USER_PREFERENCE_DEFAULT_SHIFT, 'A'),
+            'max_hours_per_day' => $this->configuration->getTimesheetMaxHoursPerDay(),
+            'quick_entry_user' => $user,
         ]);
     }
 }

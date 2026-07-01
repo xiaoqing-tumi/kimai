@@ -100,10 +100,26 @@ final class MPdfConverter implements HtmlToPdfConverter
     }
 
     /**
+     * Default mPDF options for correct rendering of non-Latin scripts (e.g. Chinese, Japanese, Korean).
+     *
+     * @return array<string, bool|string>
+     */
+    private function getUnicodeDefaults(): array
+    {
+        return [
+            'autoScriptToLang' => true,
+            'autoLangToFont' => true,
+            'useSubstitutions' => true,
+            'default_font' => 'dejavusans',
+        ];
+    }
+
+    /**
      * @param array<string, mixed|array<string, mixed>> $options
      */
     private function initMpdf(array $options): Mpdf
     {
+        $options = array_merge($this->getUnicodeDefaults(), $options);
         $options['fontDir'] = $this->getFontDirectories();
         $options['fontdata'] = $this->mergeFontData($options);
 
