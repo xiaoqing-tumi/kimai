@@ -9,8 +9,7 @@
 
 namespace App\Command;
 
-use App\Entity\AttendanceRecord;
-use App\Entity\User;
+use App\Attendance\DemoAttendanceGenerator;
 use App\Repository\AttendanceRecordRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,12 +29,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 final class SeedAttendanceCommand extends Command
 {
-    private const DEMO_SOURCE = 'demo';
-
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly AttendanceRecordRepository $attendanceRecordRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly DemoAttendanceGenerator $demoAttendanceGenerator,
     ) {
         parent::__construct();
     }
@@ -85,6 +83,26 @@ final class SeedAttendanceCommand extends Command
         $syncedAt = new \DateTime();
 
         foreach ($users as $user) {
+            if ($force) {
+                $day = $yearStart;
+                while ($day <= $endDate) {
+                    if ($weekdaysOnly && $this->isWeekend($day)) {
+                        $day = $day->modify('+1 day');
+                        continue;
+                    }
+
+                    $existing = $this->attendanceRecordRepository->findForUserAndDate($user, $day);
+                    if ($existing !== null && $existing->getExternalSource() === DemoAttendanceGenerator::DEMO_SOURCE) {
+                        $this->entityManager->remove($existing);
+                        $replaced++;
+                    }
+
+                    $day = $day->modify('+1 day');
+                }
+
+                $this->entityManager->flush();
+            }
+
             $day = $yearStart;
             while ($day <= $endDate) {
                 if ($weekdaysOnly && $this->isWeekend($day)) {
@@ -94,17 +112,12 @@ final class SeedAttendanceCommand extends Command
 
                 $existing = $this->attendanceRecordRepository->findForUserAndDate($user, $day);
                 if ($existing !== null) {
-                    if ($force && $existing->getExternalSource() === self::DEMO_SOURCE) {
-                        $this->entityManager->remove($existing);
-                        $replaced++;
-                    } else {
-                        $skipped++;
-                        $day = $day->modify('+1 day');
-                        continue;
-                    }
+                    $skipped++;
+                    $day = $day->modify('+1 day');
+                    continue;
                 }
 
-                $record = $this->createDemoRecord($user, $day, $syncedAt);
+                $record = $this->demoAttendanceGenerator->createRecord($user, $day, $syncedAt);
                 $this->entityManager->persist($record);
                 $created++;
 
@@ -125,30 +138,6 @@ final class SeedAttendanceCommand extends Command
         ));
 
         return self::SUCCESS;
-    }
-
-    private function createDemoRecord(User $user, \DateTimeImmutable $day, \DateTime $syncedAt): AttendanceRecord
-    {
-        $shiftA = random_int(0, 1) === 1;
-
-        if ($shiftA) {
-            $clockIn = $day->setTime(8, random_int(30, 59), random_int(0, 59));
-            $clockOut = $day->setTime(18, random_int(0, 10), random_int(0, 59));
-        } else {
-            $clockIn = $day->setTime(9, random_int(1, 29), random_int(0, 59));
-            $clockOut = $day->setTime(18, random_int(25, 35), random_int(0, 59));
-        }
-
-        $record = new AttendanceRecord();
-        $record->setUser($user);
-        $record->setDate($day);
-        $record->setClockIn(\DateTime::createFromImmutable($clockIn));
-        $record->setClockOut(\DateTime::createFromImmutable($clockOut));
-        $record->setExternalSource(self::DEMO_SOURCE);
-        $record->setExternalId(\sprintf('demo-%d-%s', $user->getId(), $day->format('Y-m-d')));
-        $record->setSyncedAt($syncedAt);
-
-        return $record;
     }
 
     private function isWeekend(\DateTimeImmutable $day): bool

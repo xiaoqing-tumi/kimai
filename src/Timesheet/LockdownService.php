@@ -15,10 +15,21 @@ use App\Entity\User;
 
 final class LockdownService
 {
+    private const USER_LOCKDOWN_START = 'lockdown_period_start';
+    private const USER_LOCKDOWN_END = 'lockdown_period_end';
+    private const USER_LOCKDOWN_TIMEZONE = 'lockdown_period_timezone';
+    private const USER_LOCKDOWN_GRACE = 'lockdown_grace_period';
+
     private ?bool $isActive = null;
 
     public function __construct(private readonly SystemConfiguration $configuration)
     {
+    }
+
+    public function isUserLockdownActive(User $user): bool
+    {
+        return $this->getUserLockdownPeriodEnd($user) !== null
+            && $this->getUserLockdownPeriodStart($user) !== null;
     }
 
     public function isLockdownActive(): bool
@@ -177,13 +188,28 @@ final class LockdownService
      */
     public function isEditable(Timesheet $timesheet, \DateTimeInterface $now, bool $allowEditInGracePeriod = false): bool
     {
-        if (!$this->isLockdownActive()) {
-            return true;
-        }
-
         $timesheetStart = $timesheet->getBegin();
 
         if (null === $timesheetStart) {
+            return true;
+        }
+
+        $user = $timesheet->getUser();
+        if ($user !== null && $this->isUserLockdownActive($user)) {
+            if (!$this->isEditableInLockdownPeriod(
+                $timesheetStart,
+                $now,
+                $allowEditInGracePeriod,
+                $this->getUserLockdownPeriodStart($user),
+                $this->getUserLockdownPeriodEnd($user),
+                $this->getUserLockdownGracePeriod($user),
+                $this->getUserLockdownTimezone($user, $timesheetStart)
+            )) {
+                return false;
+            }
+        }
+
+        if (!$this->isLockdownActive()) {
             return true;
         }
 
@@ -194,40 +220,96 @@ final class LockdownService
             return true;
         }
 
-        $gracePeriod = $this->getLockdownGracePeriod();
-        $timezone = $this->getLockdownTimezone();
+        return $this->isEditableInLockdownPeriod(
+            $timesheetStart,
+            $now,
+            $allowEditInGracePeriod,
+            $lockedStart,
+            $lockedEnd,
+            $this->getLockdownGracePeriod(),
+            $this->resolveLockdownTimezone($this->getLockdownTimezone(), $timesheetStart)
+        );
+    }
 
-        if ($timezone === null) {
-            $timezone = $timesheetStart->getTimezone();
-        } else {
-            $timezone = new \DateTimeZone($timezone);
+    private function getUserLockdownPeriodStart(User $user): ?string
+    {
+        $start = $user->getPreferenceValue(self::USER_LOCKDOWN_START, false);
+        if ($start === false || !\is_string($start) || trim($start) === '') {
+            return null;
+        }
+
+        return $start;
+    }
+
+    private function getUserLockdownPeriodEnd(User $user): ?string
+    {
+        $end = $user->getPreferenceValue(self::USER_LOCKDOWN_END, false);
+        if ($end === false || !\is_string($end) || trim($end) === '') {
+            return null;
+        }
+
+        return $end;
+    }
+
+    private function getUserLockdownGracePeriod(User $user): ?string
+    {
+        $grace = $user->getPreferenceValue(self::USER_LOCKDOWN_GRACE, false);
+        if ($grace === false || !\is_string($grace) || trim($grace) === '') {
+            return null;
+        }
+
+        return $grace;
+    }
+
+    private function getUserLockdownTimezone(User $user, \DateTimeInterface $timesheetStart): \DateTimeZone
+    {
+        $timezone = $user->getPreferenceValue(self::USER_LOCKDOWN_TIMEZONE, false);
+        if (\is_string($timezone) && $timezone !== '') {
+            return new \DateTimeZone($timezone);
+        }
+
+        return $this->resolveLockdownTimezone(null, $timesheetStart);
+    }
+
+    private function resolveLockdownTimezone(?string $timezone, \DateTimeInterface $timesheetStart): \DateTimeZone
+    {
+        if ($timezone === null || $timezone === '') {
+            return $timesheetStart->getTimezone();
+        }
+
+        return new \DateTimeZone($timezone);
+    }
+
+    private function isEditableInLockdownPeriod(
+        \DateTimeInterface $timesheetStart,
+        \DateTimeInterface $now,
+        bool $allowEditInGracePeriod,
+        ?string $lockedStart,
+        ?string $lockedEnd,
+        ?string $gracePeriod,
+        \DateTimeZone $timezone
+    ): bool {
+        if ($lockedStart === null || $lockedEnd === null) {
+            return true;
         }
 
         try {
             $lockdownStart = new \DateTimeImmutable($lockedStart, $timezone);
             $lockdownEnd = new \DateTimeImmutable($lockedEnd, $timezone);
-            $lockdownGrace = clone $lockdownEnd;
-            if (!empty($gracePeriod)) {
-                $lockdownGrace = $lockdownGrace->modify($gracePeriod);
-            }
+            $lockdownGrace = $this->resolveLockdownGrace($lockdownEnd, $gracePeriod, $timezone);
         } catch (\Exception $ex) {
-            // should not happen, but ... if parsing of datetimes fails: skip validation
             return true;
         }
 
-        // misconfiguration detected, skip validation
         if ($lockdownEnd < $lockdownStart) {
             return true;
         }
 
-        // validate only entries added before the end of lockdown period
         if ($timesheetStart > $lockdownEnd) {
             return true;
         }
 
-        // further validate entries inside the most recent lockdown
         if ($timesheetStart >= $lockdownStart) {
-            // if grace period is still in effect, validation succeeds
             if ($now <= $lockdownGrace) {
                 return true;
             }
@@ -238,5 +320,21 @@ final class LockdownService
         }
 
         return false;
+    }
+
+    private function resolveLockdownGrace(
+        \DateTimeImmutable $lockdownEnd,
+        ?string $gracePeriod,
+        \DateTimeZone $timezone
+    ): \DateTimeImmutable {
+        if ($gracePeriod === null || $gracePeriod === '') {
+            return $lockdownEnd;
+        }
+
+        if ($gracePeriod[0] === '+' || $gracePeriod[0] === '-') {
+            return $lockdownEnd->modify($gracePeriod);
+        }
+
+        return new \DateTimeImmutable($gracePeriod, $timezone);
     }
 }

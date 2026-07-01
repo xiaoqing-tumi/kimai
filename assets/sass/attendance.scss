@@ -37,4 +37,128 @@
             font-weight: 500;
         }
     }
+
+    .attendance-calendar {
+        &__header,
+        &__grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+        }
+
+        &__header {
+            border-bottom: 1px solid var(--tblr-border-color);
+            margin-bottom: 0.5rem;
+        }
+
+        &__weekday {
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--tblr-secondary);
+        }
+
+        &__grid {
+            gap: 0.5rem;
+        }
+
+        &__day {
+            min-height: 7.5rem;
+            border: 1px solid var(--tblr-border-color);
+            border-radius: var(--tblr-border-radius);
+            padding: 0.5rem;
+            background: var(--tblr-card-bg);
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+
+            &--outside {
+                background: var(--tblr-bg-surface-secondary);
+                opacity: 0.65;
+            }
+
+            &--today {
+                border-color: var(--kimai-brand);
+                box-shadow: inset 0 0 0 1px rgba(var(--kimai-brand-rgb), 0.25);
+            }
+
+            &--weekend:not(&--outside) {
+                background: var(--tblr-bg-surface-secondary);
+            }
+        }
+
+        &__day-number {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--tblr-secondary);
+        }
+
+        &__entry {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+            flex: 1;
+        }
+
+        &__times {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+            font-size: 0.75rem;
+            color: var(--tblr-secondary);
+        }
+
+        &__time {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            white-space: nowrap;
+        }
+
+        &__empty {
+            font-size: 0.75rem;
+            color: var(--tblr-muted);
+            margin-top: auto;
+        }
+    }
+
+    .attendance-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem 1.5rem;
+        font-size: 0.875rem;
+
+        &__item {
+            color: var(--tblr-secondary);
+        }
+    }
+
+    @media (max-width: 991.98px) {
+        .attendance-calendar {
+            &__day {
+                min-height: 6rem;
+                padding: 0.375rem;
+            }
+
+            .attendance-shift__time {
+                display: none;
+            }
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        .attendance-calendar {
+            &__grid {
+                gap: 0.25rem;
+            }
+
+            &__day {
+                min-height: 4.5rem;
+            }
+
+            &__times {
+                display: none;
+            }
+        }
+    }
 }

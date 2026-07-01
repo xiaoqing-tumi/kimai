@@ -24,12 +24,13 @@ final class ShiftResolverTest extends TestCase
     public function testResolveFromAttendanceBeforeNine(): void
     {
         $user = new User();
+        $user->setTimezone('Asia/Shanghai');
         $date = new \DateTime('2026-06-30');
 
         $record = new AttendanceRecord();
         $record->setUser($user);
         $record->setDate(new \DateTimeImmutable('2026-06-30'));
-        $record->setClockIn(new \DateTime('2026-06-30 08:45:00'));
+        $record->setClockIn(new \DateTime('2026-06-30 08:45:00', new \DateTimeZone('Asia/Shanghai')));
 
         $repository = $this->createMock(AttendanceRecordRepository::class);
         $repository->method('findForUserAndDate')->willReturn($record);
@@ -41,6 +42,29 @@ final class ShiftResolverTest extends TestCase
         $shift = $sut->resolve($user, $date);
 
         self::assertEquals(ShiftTemplate::SHIFT_A, $shift->getId());
+    }
+
+    public function testResolveFromAttendanceAfterNineInUserTimezone(): void
+    {
+        $user = new User();
+        $user->setTimezone('Asia/Shanghai');
+        $date = new \DateTime('2026-06-30');
+
+        $record = new AttendanceRecord();
+        $record->setUser($user);
+        $record->setDate(new \DateTimeImmutable('2026-06-30'));
+        $record->setClockIn(new \DateTime('2026-06-30 01:00:00', new \DateTimeZone('UTC')));
+
+        $repository = $this->createMock(AttendanceRecordRepository::class);
+        $repository->method('findForUserAndDate')->willReturn($record);
+
+        $configuration = $this->createMock(SystemConfiguration::class);
+        $configuration->method('getShiftLunchBreakSeconds')->willReturn(3600);
+
+        $sut = new ShiftResolver($repository, $configuration);
+        $shift = $sut->resolve($user, $date);
+
+        self::assertEquals(ShiftTemplate::SHIFT_B, $shift->getId());
     }
 
     public function testResolveFromUserPreferenceWhenNoAttendance(): void

@@ -36,6 +36,8 @@ class WorkingTimeService
     private const LATEST_APPROVAL_FORMAT = 'Y-m-d H:i:s';
     /** @var array<string, WorkingTime|null> */
     private array $latestApprovals = [];
+    /** @var array<string, \DateTimeInterface|null> */
+    private array $resolvedLatestApprovalDates = [];
 
     public function __construct(
         private readonly TimesheetRepository $timesheetRepository,
@@ -80,10 +82,15 @@ class WorkingTimeService
         return $this->latestApprovals[$key];
     }
 
-    public function getLatestApprovalDate(User $user): ?\DateTimeInterface
+    public function getLatestApprovalDate(User $user, bool $persistPreference = true): ?\DateTimeInterface
     {
         if ($user->getId() === null) {
             return null;
+        }
+
+        $cacheKey = 'u_' . $user->getId();
+        if (!$persistPreference && \array_key_exists($cacheKey, $this->resolvedLatestApprovalDates)) {
+            return $this->resolvedLatestApprovalDates[$cacheKey];
         }
 
         $date = $user->getPreferenceValue(self::LATEST_APPROVAL_PREF, false);
@@ -93,25 +100,29 @@ class WorkingTimeService
         if ($date === false) {
             $date = $this->workingTimeRepository->getLatestApprovalDate($user);
 
-            // let's store the approval always: we can later detect if an approval exists
-            // or not based on the existence of the preference, which saves DB queries
-            $value = ($date !== null) ? $date->format(self::LATEST_APPROVAL_FORMAT) : null;
-            $user->setPreferenceValue(self::LATEST_APPROVAL_PREF, $value);
-            $this->userRepository->saveUser($user);
-
-            return $date;
+            if ($persistPreference) {
+                // let's store the approval always: we can later detect if an approval exists
+                // or not based on the existence of the preference, which saves DB queries
+                $value = ($date !== null) ? $date->format(self::LATEST_APPROVAL_FORMAT) : null;
+                $user->setPreferenceValue(self::LATEST_APPROVAL_PREF, $value);
+                $this->userRepository->saveUser($user);
+            }
+        } elseif (\is_string($date)) {
+            $date = new \DateTimeImmutable($date, new \DateTimeZone($user->getTimezone()));
+        } else {
+            $date = null;
         }
 
-        if (\is_string($date)) {
-            return new \DateTimeImmutable($date, new \DateTimeZone($user->getTimezone()));
+        if (!$persistPreference) {
+            $this->resolvedLatestApprovalDates[$cacheKey] = $date;
         }
 
-        return null;
+        return $date;
     }
 
-    public function isApproved(User $user, \DateTimeInterface $dateTime): bool
+    public function isApproved(User $user, \DateTimeInterface $dateTime, bool $persistPreference = true): bool
     {
-        $latestApprovalDate = $this->getLatestApprovalDate($user);
+        $latestApprovalDate = $this->getLatestApprovalDate($user, $persistPreference);
         if ($latestApprovalDate === null) {
             return false;
         }

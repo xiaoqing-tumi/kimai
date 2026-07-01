@@ -14,6 +14,7 @@ use App\Entity\User;
 use App\Form\Model\MultiUserTimesheet;
 use App\Security\RolePermissionManager;
 use App\Timesheet\LockdownService;
+use App\WorkingTime\WorkingTimeService;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -59,7 +60,8 @@ final class TimesheetVoter extends Voter
 
     public function __construct(
         private readonly RolePermissionManager $permissionManager,
-        private readonly LockdownService $lockdownService
+        private readonly LockdownService $lockdownService,
+        private readonly WorkingTimeService $workingTimeService
     )
     {
     }
@@ -196,6 +198,10 @@ final class TimesheetVoter extends Voter
             return false;
         }
 
+        if (!$this->isAllowedInApprovedPeriod($timesheet)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -209,7 +215,23 @@ final class TimesheetVoter extends Voter
             return false;
         }
 
+        if (!$this->isAllowedInApprovedPeriod($timesheet)) {
+            return false;
+        }
+
         return true;
+    }
+
+    private function isAllowedInApprovedPeriod(Timesheet $timesheet): bool
+    {
+        $owner = $timesheet->getUser();
+        $begin = $timesheet->getBegin();
+
+        if ($owner === null || $begin === null) {
+            return true;
+        }
+
+        return !$this->workingTimeService->isApproved($owner, $begin, false);
     }
 
     private function isAllowedExported(User $user, Timesheet $timesheet): bool
@@ -227,7 +249,9 @@ final class TimesheetVoter extends Voter
 
     private function isAllowedInLockdown(User $user, Timesheet $timesheet): bool
     {
-        if (!$this->lockdownService->isLockdownActive()) {
+        $owner = $timesheet->getUser();
+        $hasUserLockdown = $owner !== null && $this->lockdownService->isUserLockdownActive($owner);
+        if (!$hasUserLockdown && !$this->lockdownService->isLockdownActive()) {
             return true;
         }
 

@@ -9,14 +9,18 @@
 
 namespace App\Controller;
 
+use App\Attendance\AttendanceCalendarBuilder;
 use App\Attendance\AttendanceImportService;
 use App\Entity\User;
+use App\Form\AttendanceByUserForm;
+use App\Reporting\MonthByUser\MonthByUser;
 use App\Repository\AttendanceRecordRepository;
 use App\Repository\UserRepository;
 use App\Utils\PageSetup;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
@@ -30,6 +34,7 @@ final class AttendanceController extends AbstractController
         private readonly AttendanceRecordRepository $attendanceRecordRepository,
         private readonly UserRepository $userRepository,
         private readonly AttendanceImportService $attendanceImportService,
+        private readonly AttendanceCalendarBuilder $attendanceCalendarBuilder,
     ) {
     }
 
@@ -40,42 +45,51 @@ final class AttendanceController extends AbstractController
         $dateTimeFactory = $this->getDateTimeFactory($currentUser);
         $canViewOthers = $this->isGranted('view_other_timesheet');
 
-        $begin = $dateTimeFactory->getStartOfWeek($dateTimeFactory->createDateTime());
-        $end = $dateTimeFactory->getEndOfWeek($begin);
+        $values = new MonthByUser();
+        $values->setUser($currentUser);
+        $values->setDate($dateTimeFactory->getStartOfMonth());
 
-        $profile = $currentUser;
-        if ($canViewOthers) {
-            $userId = $request->query->getInt('user');
-            if ($userId > 0) {
-                $selected = $this->userRepository->find($userId);
-                if ($selected instanceof User) {
-                    $profile = $selected;
-                }
-            }
+        $form = $this->createFormForGetRequest(AttendanceByUserForm::class, $values, [
+            'include_user' => $canViewOthers,
+            'timezone' => $dateTimeFactory->getTimezone()->getName(),
+            'start_date' => $values->getDate(),
+        ]);
+
+        $form->submit($request->query->all(), false);
+
+        if ($values->getUser() === null) {
+            $values->setUser($currentUser);
         }
 
-        $dateParam = $request->query->get('date');
-        if (\is_string($dateParam) && $dateParam !== '') {
-            try {
-                $parsed = $dateTimeFactory->createDateTime($dateParam);
-                $begin = $dateTimeFactory->getStartOfWeek($parsed);
-                $end = $dateTimeFactory->getEndOfWeek($begin);
-            } catch (\Exception) {
-            }
+        /** @var User $profile */
+        $profile = $values->getUser();
+
+        if ($currentUser !== $profile && !$canViewOthers) {
+            throw new AccessDeniedException('User is not allowed to see other users attendance');
         }
 
-        $records = $this->attendanceRecordRepository->findForUserInRange($profile, $begin, $end);
+        $profileFactory = $this->getDateTimeFactory($profile);
+
+        if ($values->getDate() === null) {
+            $values->setDate($profileFactory->getStartOfMonth());
+        }
+
+        $monthStart = $profileFactory->getStartOfMonth($values->getDate());
+        $monthEnd = $profileFactory->getEndOfMonth($monthStart);
+
+        $records = $this->attendanceRecordRepository->findForUserInRange($profile, $monthStart, $monthEnd);
+        $calendar = $this->attendanceCalendarBuilder->buildMonthView($profileFactory, $monthStart, $monthEnd, $records);
 
         $page = new PageSetup('attendance.title');
         $page->setActionName('attendance');
+        $page->setPaginationForm($form);
 
         return $this->render('attendance/index.html.twig', [
             'page_setup' => $page,
             'records' => $records,
             'profile' => $profile,
-            'week_begin' => $begin,
-            'week_end' => $end,
-            'can_view_others' => $canViewOthers,
+            'month_start' => $monthStart,
+            'calendar' => $calendar,
         ]);
     }
 

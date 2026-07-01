@@ -11,6 +11,7 @@ namespace App\Controller;
 
 use App\Timesheet\Shift\ShiftResolver;
 use App\Configuration\SystemConfiguration;
+use App\Entity\User;
 use App\Event\QuickEntryMetaDisplayEvent;
 use App\Form\QuickEntryForm;
 use App\Form\WeekByUserForm;
@@ -19,7 +20,9 @@ use App\Reporting\WeekByUser\WeekByUser;
 use App\Repository\Query\TimesheetQuery;
 use App\Repository\TimesheetRepository;
 use App\Repository\UserRepository;
+use App\Timesheet\DateTimeFactory;
 use App\Timesheet\FavoriteRecordService;
+use App\Timesheet\LockdownService;
 use App\Timesheet\TimesheetService;
 use App\Utils\PageSetup;
 use App\WorkingTime\WorkingTimeService;
@@ -43,6 +46,7 @@ final class QuickEntryController extends AbstractController
         private readonly EventDispatcherInterface $dispatcher,
         private readonly WorkingTimeService $workingTimeService,
         private readonly UserRepository $userRepository,
+        private readonly LockdownService $lockdownService,
     )
     {
     }
@@ -127,7 +131,7 @@ final class QuickEntryController extends AbstractController
         ksort($rows);
 
         // this should also check via lock service
-        $locked = $this->workingTimeService->isApproved($user, $endWeek);
+        $locked = $this->isWeekLocked($user, $endWeek, $factory);
 
         if (!$locked) {
             // attach recent activities
@@ -239,9 +243,21 @@ final class QuickEntryController extends AbstractController
             'prototype_data' => $empty,
             'start_date' => $startWeek,
             'end_date' => $endWeek,
+            'locked' => $locked,
         ]);
 
         $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            if ($locked) {
+                $this->addFlash(
+                    'warning',
+                    $this->getTranslator()->trans('The chosen date is already locked.', [], 'validators')
+                );
+
+                return $this->redirectToRoute('quick_entry', ['date' => $begin->format('Y-m-d'), 'user' => $user->getId()]);
+            }
+        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var QuickEntryWeek $data */
@@ -318,5 +334,17 @@ final class QuickEntryController extends AbstractController
             'max_hours_per_day' => $this->configuration->getTimesheetMaxHoursPerDay(),
             'quick_entry_user' => $user,
         ]);
+    }
+
+    private function isWeekLocked(User $user, \DateTimeInterface $endWeek, DateTimeFactory $factory): bool
+    {
+        if ($this->workingTimeService->isApproved($user, $endWeek)) {
+            return true;
+        }
+
+        $check = $this->timesheetService->createNewTimesheet($user);
+        $check->setBegin(\DateTime::createFromInterface($endWeek));
+
+        return !$this->lockdownService->isEditable($check, $factory->createDateTime(), false);
     }
 }

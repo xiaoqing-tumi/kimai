@@ -1044,7 +1044,7 @@
       </trans-unit>
       <trans-unit id="att002" resname="attendance.help">
         <source>attendance.help</source>
-        <target>来自外部系统的打卡数据。用于判定 A 班（9:00 前到岗）或 B 班（9:00 及之后到岗）。</target>
+        <target>来自外部系统的打卡数据。A 班 9:00–18:00（9:00 前到岗），B 班 9:30–18:30（9:00 及之后到岗）。</target>
       </trans-unit>
       <trans-unit id="att003" resname="attendance.clock_in">
         <source>attendance.clock_in</source>
@@ -1068,7 +1068,23 @@
       </trans-unit>
       <trans-unit id="att008" resname="attendance.empty">
         <source>attendance.empty</source>
-        <target>本周暂无考勤记录。</target>
+        <target>本月暂无考勤记录。</target>
+      </trans-unit>
+      <trans-unit id="att009" resname="attendance.no_record">
+        <source>attendance.no_record</source>
+        <target>无记录</target>
+      </trans-unit>
+      <trans-unit id="att010" resname="attendance.summary_days">
+        <source>attendance.summary_days</source>
+        <target>有记录 %count% 天</target>
+      </trans-unit>
+      <trans-unit id="att011" resname="attendance.summary_shift_a">
+        <source>attendance.summary_shift_a</source>
+        <target>A 班：%count% 天</target>
+      </trans-unit>
+      <trans-unit id="att012" resname="attendance.summary_shift_b">
+        <source>attendance.summary_shift_b</source>
+        <target>B 班：%count% 天</target>
       </trans-unit>
       <trans-unit id="shf001" resname="shift.label">
         <source>shift.label</source>

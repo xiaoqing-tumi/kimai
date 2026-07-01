@@ -1492,7 +1492,7 @@
       </trans-unit>
       <trans-unit id="att002" resname="attendance.help">
         <source>attendance.help</source>
-        <target>Clock-in data imported from external systems. Used to determine shift A (before 9:00) or B (from 9:00).</target>
+        <target>Clock-in data imported from external systems. Shift A: 9:00–18:00 (clock-in before 9:00). Shift B: 9:30–18:30 (clock-in from 9:00).</target>
       </trans-unit>
       <trans-unit id="att003" resname="attendance.clock_in">
         <source>attendance.clock_in</source>
@@ -1516,7 +1516,23 @@
       </trans-unit>
       <trans-unit id="att008" resname="attendance.empty">
         <source>attendance.empty</source>
-        <target>No attendance records for this week.</target>
+        <target>No attendance records for this month.</target>
+      </trans-unit>
+      <trans-unit id="att009" resname="attendance.no_record">
+        <source>attendance.no_record</source>
+        <target>No record</target>
+      </trans-unit>
+      <trans-unit id="att010" resname="attendance.summary_days">
+        <source>attendance.summary_days</source>
+        <target>%count% days with records</target>
+      </trans-unit>
+      <trans-unit id="att011" resname="attendance.summary_shift_a">
+        <source>attendance.summary_shift_a</source>
+        <target>Shift A: %count%</target>
+      </trans-unit>
+      <trans-unit id="att012" resname="attendance.summary_shift_b">
+        <source>attendance.summary_shift_b</source>
+        <target>Shift B: %count%</target>
       </trans-unit>
       <trans-unit id="shf001" resname="shift.label">
         <source>shift.label</source>

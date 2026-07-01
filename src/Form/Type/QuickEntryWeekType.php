@@ -109,13 +109,30 @@ final class QuickEntryWeekType extends AbstractType
                 'timezone' => $options['timezone'],
                 'duration_minutes' => $options['duration_minutes'],
                 'duration_hours' => $options['duration_hours'],
+                'locked' => $options['locked'],
             ],
-            'allow_add' => true,
+            'allow_add' => !$options['locked'],
             'constraints' => [
                 // having "new Valid()," here will trigger constraint violations on activity and project for completely empty rows
                 new All(['constraints' => [new QuickEntryTimesheet()]])
             ],
         ]);
+
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($options): void {
+            if (!$options['locked']) {
+                return;
+            }
+
+            $form = $event->getForm();
+            foreach ($form->all() as $key => $child) {
+                if ($child->isDisabled()) {
+                    continue;
+                }
+
+                $type = \get_class($child->getConfig()->getType()->getInnerType());
+                $form->add($key, $type, array_merge($child->getConfig()->getOptions(), ['disabled' => true]));
+            }
+        });
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options): void {
             if ($event->getData() === null && $options['prototype_data'] instanceof QuickEntryModel) {
@@ -187,6 +204,7 @@ final class QuickEntryWeekType extends AbstractType
             'start_date' => new DateTime(),
             'end_date' => new DateTime(),
             'prototype_data' => null,
+            'locked' => false,
         ]);
     }
 }

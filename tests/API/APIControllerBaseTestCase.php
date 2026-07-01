@@ -353,6 +353,25 @@ abstract class APIControllerBaseTestCase extends AbstractControllerBaseTestCase
                     'visible' => 'bool',
                 ];
 
+            case 'AttendanceEntity':
+            case 'AttendanceCollection':
+                return [
+                    'id' => 'int',
+                    'user' => 'int',
+                    'date' => 'date',
+                    'clockIn' => '@datetime',
+                    'clockOut' => '@datetime',
+                    'shift' => '@string',
+                    'externalSource' => '@string',
+                    'externalId' => '@string',
+                    'syncedAt' => '@datetime',
+                ];
+
+            case 'AttendanceImportResult':
+                return [
+                    'imported' => 'int',
+                ];
+
                 // embedded meta data
             case 'UserPreference':
                 return [

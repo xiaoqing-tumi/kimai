@@ -20,6 +20,7 @@ use App\Form\Model\MultiUserTimesheet;
 use App\Tests\Mocks\SystemConfigurationFactory;
 use App\Timesheet\LockdownService;
 use App\Voter\TimesheetVoter;
+use App\WorkingTime\WorkingTimeService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -240,7 +241,7 @@ class TimesheetVoterTest extends AbstractVoterTestCase
         return $user;
     }
 
-    private function getLockdownVoter(?string $lockdownBegin = null, ?string $lockdownEnd = null, ?string $lockdownGrace = null): TimesheetVoter
+    private function getLockdownVoter(?string $lockdownBegin = null, ?string $lockdownEnd = null, ?string $lockdownGrace = null, ?WorkingTimeService $workingTimeService = null): TimesheetVoter
     {
         $loader = $this->createMock(ConfigLoaderInterface::class);
         $config = SystemConfigurationFactory::create($loader, [
@@ -253,7 +254,57 @@ class TimesheetVoterTest extends AbstractVoterTestCase
             ]
         ]);
 
-        return new TimesheetVoter($this->getRolePermissionManager(), new LockdownService($config));
+        if ($workingTimeService === null) {
+            $workingTimeService = $this->createMock(WorkingTimeService::class);
+            $workingTimeService->method('isApproved')->willReturn(false);
+        }
+
+        return new TimesheetVoter($this->getRolePermissionManager(), new LockdownService($config), $workingTimeService);
+    }
+
+    public function testEditAndDeleteDeniedInApprovedPeriod(): void
+    {
+        $user = self::getTestUser(1, User::ROLE_USER);
+        $timesheet = self::getTimesheet($user);
+        $timesheet->setBegin(new \DateTime('2026-06-24 08:00:00'));
+
+        $workingTimeService = $this->createMock(WorkingTimeService::class);
+        $workingTimeService->method('isApproved')->willReturn(true);
+
+        $token = new UsernamePasswordToken($user, 'bar', $user->getRoles());
+        $sut = $this->getLockdownVoter(null, null, null, $workingTimeService);
+
+        self::assertEquals(VoterInterface::ACCESS_DENIED, $sut->vote($token, $timesheet, ['edit']));
+        self::assertEquals(VoterInterface::ACCESS_DENIED, $sut->vote($token, $timesheet, ['delete']));
+    }
+
+    public function testEditAndDeleteDeniedInUserLockdownPeriod(): void
+    {
+        $user = $this->createStub(User::class);
+        $user->method('getId')->willReturn(1);
+        $user->method('getRoles')->willReturn([User::ROLE_USER]);
+        $user->method('getTeams')->willReturn([]);
+        $user->method('getTimezone')->willReturn('Asia/Shanghai');
+        $user->method('getPreferenceValue')->willReturnCallback(
+            function (string $name, $default = null) {
+                return match ($name) {
+                    'lockdown_period_start' => '0000-01-01 00:00:01',
+                    'lockdown_period_end' => '2026-06-28 23:59:59',
+                    'lockdown_period_timezone' => 'Asia/Shanghai',
+                    'lockdown_grace_period' => '2026-06-28 23:59:59',
+                    default => $default,
+                };
+            }
+        );
+
+        $timesheet = self::getTimesheet($user);
+        $timesheet->setBegin(new \DateTime('2026-06-24 08:00:00', new \DateTimeZone('Asia/Shanghai')));
+
+        $token = new UsernamePasswordToken($user, 'bar', $user->getRoles());
+        $sut = $this->getLockdownVoter(null, null, null);
+
+        self::assertEquals(VoterInterface::ACCESS_DENIED, $sut->vote($token, $timesheet, ['edit']));
+        self::assertEquals(VoterInterface::ACCESS_DENIED, $sut->vote($token, $timesheet, ['delete']));
     }
 
     /**

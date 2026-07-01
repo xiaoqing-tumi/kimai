@@ -59,14 +59,14 @@ final class QuickEntryTimesheetType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::POST_SET_DATA,
-            function (FormEvent $event) use ($durationOptions): void {
+            function (FormEvent $event) use ($durationOptions, $options): void {
                 /** @var Timesheet|null $data */
                 $data = $event->getData();
                 if (null === $data || $data->isRunning()) {
                     $event->getForm()->get('duration')->setData(null);
                 }
 
-                if ($data instanceof Timesheet && !$this->security->isGranted('edit', $data)) {
+                if ($data instanceof Timesheet && ($options['locked'] || !$this->security->isGranted('edit', $data))) {
                     // do not call $event->getForm()->remove() this would change the field order
                     $event->getForm()->add('duration', DurationType::class, array_merge(['disabled' => true], $durationOptions));
 
@@ -81,7 +81,7 @@ final class QuickEntryTimesheetType extends AbstractType
                         if ($key === 'timesheets') {
                             continue;
                         }
-                        if ($child->isDisabled() || $isNew) {
+                        if ($child->isDisabled() || ($isNew && !$options['locked'])) {
                             continue;
                         }
                         $type = \get_class($child->getConfig()->getType()->getInnerType());
@@ -128,6 +128,7 @@ final class QuickEntryTimesheetType extends AbstractType
             'timezone' => date_default_timezone_get(),
             'duration_minutes' => null,
             'duration_hours' => 8,
+            'locked' => false,
         ]);
     }
 }

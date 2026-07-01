@@ -160,4 +160,56 @@ class LockdownServiceTest extends TestCase
         $sut = $this->createService('+5 days', '+5 days');
         self::assertTrue($sut->isLockdownActive());
     }
+
+    public function testUserLockdownBlocksEditingAfterGracePeriod(): void
+    {
+        $sut = $this->createService(null, null);
+
+        $user = $this->createStub(\App\Entity\User::class);
+        $user->method('getPreferenceValue')->willReturnCallback(
+            function (string $name, $default = null) {
+                return match ($name) {
+                    'lockdown_period_start' => '0000-01-01 00:00:01',
+                    'lockdown_period_end' => '2026-06-28 23:59:59',
+                    'lockdown_period_timezone' => 'Asia/Shanghai',
+                    'lockdown_grace_period' => '2026-06-28 23:59:59',
+                    default => $default,
+                };
+            }
+        );
+        $user->method('getTimezone')->willReturn('Asia/Shanghai');
+
+        self::assertTrue($sut->isUserLockdownActive($user));
+
+        $timesheet = new Timesheet();
+        $timesheet->setUser($user);
+        $timesheet->setBegin(new \DateTime('2026-06-24 08:00:00', new \DateTimeZone('Asia/Shanghai')));
+
+        self::assertFalse($sut->isEditable($timesheet, new \DateTime('2026-07-01 10:00:00', new \DateTimeZone('Asia/Shanghai')), false));
+    }
+
+    public function testUserLockdownAllowsEditingAfterLockdownEndDate(): void
+    {
+        $sut = $this->createService(null, null);
+
+        $user = $this->createStub(\App\Entity\User::class);
+        $user->method('getPreferenceValue')->willReturnCallback(
+            function (string $name, $default = null) {
+                return match ($name) {
+                    'lockdown_period_start' => '0000-01-01 00:00:01',
+                    'lockdown_period_end' => '2026-06-28 23:59:59',
+                    'lockdown_period_timezone' => 'Asia/Shanghai',
+                    'lockdown_grace_period' => '2026-06-28 23:59:59',
+                    default => $default,
+                };
+            }
+        );
+        $user->method('getTimezone')->willReturn('Asia/Shanghai');
+
+        $timesheet = new Timesheet();
+        $timesheet->setUser($user);
+        $timesheet->setBegin(new \DateTime('2026-07-01 08:00:00', new \DateTimeZone('Asia/Shanghai')));
+
+        self::assertTrue($sut->isEditable($timesheet, new \DateTime('2026-07-01 10:00:00', new \DateTimeZone('Asia/Shanghai')), false));
+    }
 }

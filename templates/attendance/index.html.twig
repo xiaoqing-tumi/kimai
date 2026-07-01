@@ -1,55 +1,108 @@
-{% extends 'page_setup.html.twig' %}
-
-{% block page_class %}attendance-page{% endblock %}
-
-{% block main %}
-    {% embed '@theme/embeds/card.html.twig' with {fullsize: true} %}
-        {% block box_title %}{{ 'attendance.title'|trans }}{% endblock %}
-        {% block box_body_class %}p-0{% endblock %}
-        {% block box_body %}
-            <div class="card-body border-bottom">
-                <p class="text-muted mb-0">{{ 'attendance.help'|trans }}</p>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-vcenter">
-                    <thead>
-                        <tr>
-                            <th>{{ 'date'|trans }}</th>
-                            <th>{{ 'attendance.clock_in'|trans }}</th>
-                            <th>{{ 'attendance.clock_out'|trans }}</th>
-                            <th>{{ 'attendance.shift'|trans }}</th>
-                            <th>{{ 'attendance.source'|trans }}</th>
-                            <th>{{ 'attendance.synced_at'|trans }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in records %}
-                            <tr>
-                                <td>{{ record.date|date_short }}</td>
-                                <td>{{ record.clockIn ? record.clockIn|date_time : '—' }}</td>
-                                <td>{{ record.clockOut ? record.clockOut|date_time : '—' }}</td>
-                                <td>
-                                    {% if record.resolvedShiftId %}
-                                        {% set shiftId = record.resolvedShiftId|lower %}
-                                        <div class="attendance-shift attendance-shift--{{ shiftId }}">
-                                            <span class="attendance-shift__badge">{{ ('shift.name_' ~ shiftId)|trans }}</span>
-                                            <span class="attendance-shift__time">{{ ('shift.hours_' ~ shiftId)|trans }}</span>
-                                        </div>
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-                                <td>{{ record.externalSource ?? '—' }}</td>
-                                <td>{{ record.syncedAt ? record.syncedAt|date_time : '—' }}</td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="6" class="text-center text-muted py-4">{{ 'attendance.empty'|trans }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% endblock %}
-    {% endembed %}
-{% endblock %}
+{% extends 'page_setup.html.twig' %}
+
+{% block page_class %}attendance-page{% endblock %}
+
+{% block main %}
+    {% embed '@theme/embeds/card.html.twig' with {fullsize: true} %}
+        {% block box_title %}{{ 'attendance.title'|trans }}{% endblock %}
+        {% block box_body_class %}p-0{% endblock %}
+        {% block box_body %}
+            <div class="card-body border-bottom">
+                <p class="text-muted mb-0">{{ 'attendance.help'|trans }}</p>
+            </div>
+
+            <div class="attendance-calendar p-3">
+                <div class="attendance-calendar__header">
+                    {% for header in calendar.weekdayHeaders %}
+                        <div class="attendance-calendar__weekday">{{ header|date_weekday }}</div>
+                    {% endfor %}
+                </div>
+                <div class="attendance-calendar__grid">
+                    {% for week in calendar.weeks %}
+                        {% for day in week %}
+                            <div class="attendance-calendar__day{% if not day.inMonth %} attendance-calendar__day--outside{% endif %}{% if day.date is today %} attendance-calendar__day--today{% endif %}{% if day.date is weekend %} attendance-calendar__day--weekend{% endif %}">
+                                <div class="attendance-calendar__day-number">{{ day.date|date('j') }}</div>
+                                {% if day.record %}
+                                    {% set shiftId = day.record.resolvedShiftId|lower %}
+                                    <div class="attendance-calendar__entry">
+                                        <div class="attendance-shift attendance-shift--{{ shiftId }}">
+                                            <span class="attendance-shift__badge">{{ ('shift.name_' ~ shiftId)|trans }}</span>
+                                            <span class="attendance-shift__time">{{ ('shift.hours_' ~ shiftId)|trans }}</span>
+                                        </div>
+                                        <div class="attendance-calendar__times">
+                                            <div class="attendance-calendar__time" title="{{ 'attendance.clock_in'|trans }}">
+                                                {{ icon('start', true) }}
+                                                {{ day.record.clockIn ? day.record.clockIn|time : '—' }}
+                                            </div>
+                                            <div class="attendance-calendar__time" title="{{ 'attendance.clock_out'|trans }}">
+                                                {{ icon('stop', true) }}
+                                                {{ day.record.clockOut ? day.record.clockOut|time : '—' }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% elseif day.inMonth %}
+                                    <div class="attendance-calendar__empty">{{ 'attendance.no_record'|trans }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card-body border-top bg-light-lt">
+                <div class="attendance-summary">
+                    <span class="attendance-summary__item">
+                        {{ 'attendance.summary_days'|trans({'%count%': calendar.summary.total}) }}
+                    </span>
+                    <span class="attendance-summary__item">
+                        {{ 'attendance.summary_shift_a'|trans({'%count%': calendar.summary.shiftA}) }}
+                    </span>
+                    <span class="attendance-summary__item">
+                        {{ 'attendance.summary_shift_b'|trans({'%count%': calendar.summary.shiftB}) }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="table-responsive border-top">
+                <table class="table table-vcenter mb-0">
+                    <thead>
+                        <tr>
+                            <th>{{ 'date'|trans }}</th>
+                            <th>{{ 'attendance.clock_in'|trans }}</th>
+                            <th>{{ 'attendance.clock_out'|trans }}</th>
+                            <th>{{ 'attendance.shift'|trans }}</th>
+                            <th>{{ 'attendance.source'|trans }}</th>
+                            <th>{{ 'attendance.synced_at'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                            <tr>
+                                <td>{{ record.date|date_short }}</td>
+                                <td>{{ record.clockIn ? record.clockIn|date_time : '—' }}</td>
+                                <td>{{ record.clockOut ? record.clockOut|date_time : '—' }}</td>
+                                <td>
+                                    {% if record.resolvedShiftId %}
+                                        {% set shiftId = record.resolvedShiftId|lower %}
+                                        <div class="attendance-shift attendance-shift--{{ shiftId }}">
+                                            <span class="attendance-shift__badge">{{ ('shift.name_' ~ shiftId)|trans }}</span>
+                                            <span class="attendance-shift__time">{{ ('shift.hours_' ~ shiftId)|trans }}</span>
+                                        </div>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>{{ record.externalSource ?? '—' }}</td>
+                                <td>{{ record.syncedAt ? record.syncedAt|date_time : '—' }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">{{ 'attendance.empty'|trans }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

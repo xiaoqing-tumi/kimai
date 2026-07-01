@@ -16,24 +16,24 @@ final class ShiftTemplate
 {
     public const SHIFT_A = 'A';
     public const SHIFT_B = 'B';
-    public const FULL_DAY_NET_SECONDS = 28800;
 
     private function __construct(
         private readonly string $id,
         private readonly string $beginTime,
         private readonly string $endTime,
         private readonly int $lunchBreakSeconds,
+        private readonly int $fullDayNetSeconds,
     ) {
     }
 
     public static function shiftA(int $lunchBreakSeconds = 3600): self
     {
-        return new self(self::SHIFT_A, '09:00', '18:00', $lunchBreakSeconds);
+        return new self(self::SHIFT_A, '09:00', '18:00', $lunchBreakSeconds, 8 * 3600);
     }
 
     public static function shiftB(int $lunchBreakSeconds = 3600): self
     {
-        return new self(self::SHIFT_B, '09:30', '18:30', $lunchBreakSeconds);
+        return new self(self::SHIFT_B, '09:30', '18:30', $lunchBreakSeconds, 8 * 3600);
     }
 
     public static function fromId(string $id, int $lunchBreakSeconds = 3600): self
@@ -63,6 +63,6 @@ final class ShiftTemplate
 
     public function getFullDayNetSeconds(): int
     {
-        return self::FULL_DAY_NET_SECONDS;
+        return $this->fullDayNetSeconds;
     }
 }

@@ -45,6 +45,10 @@ nelmio_api_doc:
             - { alias: TeamMembership,              type: App\Entity\TeamMember,                    groups: [User_Entity] }
             - { alias: Invoice,                     type: App\Entity\Invoice,                       groups: [Default, Entity, Invoice, Invoice_Entity] }
             - { alias: InvoiceCollection,           type: App\Entity\Invoice,                       groups: [Default, Collection, Invoice] }
+            - { alias: AttendanceEntity,            type: App\Entity\AttendanceRecord,              groups: [Default, Entity, Attendance, Attendance_Entity, Not_Expanded] }
+            - { alias: AttendanceCollection,        type: App\Entity\AttendanceRecord,              groups: [Default, Collection, Attendance, Not_Expanded] }
+            - { alias: AttendanceImportForm,        type: App\Form\API\AttendanceImportApiForm,     groups: [Default, Entity, Attendance] }
+            - { alias: AttendanceImportResult,      type: App\API\Model\AttendanceImportResult,     groups: [Default, Attendance_Import] }
     areas:
         default:
             path_patterns:

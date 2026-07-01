@@ -226,4 +226,54 @@ class TimesheetLockdownValidatorTest extends ConstraintValidatorTestCase
         yield [false, true, 'öööö', '+11 days', null, false];
         yield [false, true, '+5 days', '+5 of !!!!', null, false];
     }
+
+    public function testUserLockdownWithoutSystemLockdown(): void
+    {
+        $user = $this->createStub(User::class);
+        $user->method('getPreferenceValue')->willReturnCallback(
+            function (string $name, $default = null) {
+                return match ($name) {
+                    'lockdown_period_start' => '0000-01-01 00:00:01',
+                    'lockdown_period_end' => '2026-06-28 23:59:59',
+                    'lockdown_period_timezone' => 'Asia/Shanghai',
+                    'lockdown_grace_period' => '2026-06-28 23:59:59',
+                    default => $default,
+                };
+            }
+        );
+
+        $auth = $this->createMock(Security::class);
+        $auth->method('getUser')->willReturn($user);
+        $auth->method('isGranted')->willReturn(false);
+
+        $loader = $this->createMock(ConfigLoaderInterface::class);
+        $config = SystemConfigurationFactory::create($loader, [
+            'timesheet' => [
+                'rules' => [
+                    'lockdown_period_start' => null,
+                    'lockdown_period_end' => null,
+                    'lockdown_grace_period' => null,
+                ],
+            ]
+        ]);
+
+        $this->validator = new TimesheetLockdownValidator($auth, new LockdownService($config));
+        $this->validator->initialize($this->context);
+
+        $timesheet = new Timesheet();
+        $timesheet->setUser($user);
+        $timesheet->setBegin(new \DateTime('2026-06-24 08:00:00', new \DateTimeZone('Asia/Shanghai')));
+
+        $constraint = new TimesheetLockdown([
+            'message' => 'myMessage',
+            'now' => new \DateTime('2026-07-01 10:00:00', new \DateTimeZone('Asia/Shanghai')),
+        ]);
+
+        $this->validator->validate($timesheet, $constraint);
+
+        $this->buildViolation('This period is locked, please choose a later date.')
+            ->atPath('property.path.begin_date')
+            ->setCode(TimesheetLockdown::PERIOD_LOCKED)
+            ->assertRaised();
+    }
 }

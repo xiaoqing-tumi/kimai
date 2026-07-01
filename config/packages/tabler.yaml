@@ -39,6 +39,7 @@ tabler:
         admin: fas fa-wrench
         administration: fas fa-toolbox
         applications: fas fa-rocket
+        attendance: fas fa-id-badge
         audit: fas fa-history
         avatar: fas fa-user
         back: fas fa-long-arrow-alt-left

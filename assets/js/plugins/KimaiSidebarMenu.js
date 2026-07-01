@@ -29,7 +29,6 @@ export default class KimaiSidebarMenu extends KimaiPlugin {
 
         items.forEach((item) => {
             this.#initDropdownItem(item);
-            this.#initDropdownHover(item);
         });
 
         sidebar.addEventListener('mousedown', (event) => {
@@ -53,36 +52,6 @@ export default class KimaiSidebarMenu extends KimaiPlugin {
     /**
      * @param {HTMLElement} item
      */
-    #initDropdownHover(item) {
-        const toggle = item.querySelector(':scope > [data-kimai-sidebar-toggle]');
-        const menu = item.querySelector(':scope > .dropdown-menu');
-
-        if (toggle === null || menu === null) {
-            return;
-        }
-
-        let openTimer = null;
-
-        item.addEventListener('mouseenter', () => {
-            openTimer = window.setTimeout(() => {
-                if (!menu.classList.contains('show')) {
-                    this.#setOpen(toggle, menu, true, this.#getStorageKeys(item));
-                }
-                this.#prefetchMenuLinks(menu);
-            }, 120);
-        });
-
-        item.addEventListener('mouseleave', () => {
-            if (openTimer !== null) {
-                clearTimeout(openTimer);
-                openTimer = null;
-            }
-        });
-    }
-
-    /**
-     * @param {HTMLElement} item
-     */
     #initDropdownItem(item) {
         const toggle = item.querySelector(':scope > [data-kimai-sidebar-toggle]');
         const menu = item.querySelector(':scope > .dropdown-menu');
@@ -101,6 +70,10 @@ export default class KimaiSidebarMenu extends KimaiPlugin {
             const willOpen = !menu.classList.contains('show');
 
             this.#setOpen(toggle, menu, willOpen, storageKeys);
+
+            if (willOpen) {
+                this.#prefetchMenuLinks(menu);
+            }
 
             if (!willOpen && item.classList.contains('active')) {
                 sessionStorage.setItem(storageKeys.collapsed, '1');

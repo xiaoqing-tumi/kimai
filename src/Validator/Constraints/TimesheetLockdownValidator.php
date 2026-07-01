@@ -35,11 +35,13 @@ final class TimesheetLockdownValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, TimesheetEntity::class);
         }
 
-        if (!$this->lockdownService->isLockdownActive()) {
+        if (null === ($timesheetStart = $value->getBegin())) {
             return;
         }
 
-        if (null === ($timesheetStart = $value->getBegin())) {
+        $owner = $value->getUser();
+        $hasUserLockdown = $owner !== null && $this->lockdownService->isUserLockdownActive($owner);
+        if (!$hasUserLockdown && !$this->lockdownService->isLockdownActive()) {
             return;
         }
 

@@ -83,6 +83,7 @@ export default class KimaiQuickEntryForm extends KimaiFormPlugin {
             return;
         }
 
+        this._disableLockedForm(form);
         this._ensureDeleteColumn(form);
         this._initDurationDropdowns(form);
         this._recalculateTotals(form);
@@ -124,9 +125,30 @@ export default class KimaiQuickEntryForm extends KimaiFormPlugin {
             return;
         }
 
+        this._disableLockedForm(form);
         this._ensureDeleteColumn(form);
         this._initDurationDropdowns(form);
         this._recalculateTotals(form);
+    }
+
+    /**
+     * @param {HTMLFormElement} form
+     * @private
+     */
+    _disableLockedForm(form)
+    {
+        if (form.dataset.locked !== '1') {
+            return;
+        }
+
+        form.querySelectorAll('input, select, textarea, button.add-item-link, button.remove-item-link, .btn-duration-preset').forEach((element) => {
+            if (element instanceof HTMLInputElement && element.type === 'hidden') {
+                return;
+            }
+
+            element.disabled = true;
+            element.setAttribute('readonly', 'readonly');
+        });
     }
 
     /**

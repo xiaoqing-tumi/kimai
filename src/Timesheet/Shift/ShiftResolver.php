@@ -12,6 +12,7 @@ namespace App\Timesheet\Shift;
 use App\Configuration\SystemConfiguration;
 use App\Entity\User;
 use App\Repository\AttendanceRecordRepository;
+use App\Timesheet\Shift\ShiftFromClockIn;
 
 final class ShiftResolver implements ShiftResolverInterface
 {
@@ -29,7 +30,7 @@ final class ShiftResolver implements ShiftResolverInterface
         $record = $this->attendanceRecordRepository->findForUserAndDate($user, $date);
 
         if ($record !== null && $record->getClockIn() !== null) {
-            return $this->resolveFromClockIn($record->getClockIn(), $lunchBreak);
+            return $this->resolveFromClockIn($record->getClockIn(), $user, $lunchBreak);
         }
 
         $preference = $user->getPreferenceValue(self::USER_PREFERENCE_DEFAULT_SHIFT, ShiftTemplate::SHIFT_A);
@@ -40,15 +41,10 @@ final class ShiftResolver implements ShiftResolverInterface
         return ShiftTemplate::fromId($preference, $lunchBreak);
     }
 
-    private function resolveFromClockIn(\DateTimeInterface $clockIn, int $lunchBreakSeconds): ShiftTemplate
+    private function resolveFromClockIn(\DateTimeInterface $clockIn, User $user, int $lunchBreakSeconds): ShiftTemplate
     {
-        $threshold = \DateTime::createFromInterface($clockIn);
-        $threshold->setTime(9, 0, 0);
+        $shiftId = ShiftFromClockIn::resolveShiftId($clockIn, $user->getTimezone());
 
-        if ($clockIn < $threshold) {
-            return ShiftTemplate::shiftA($lunchBreakSeconds);
-        }
-
-        return ShiftTemplate::shiftB($lunchBreakSeconds);
+        return ShiftTemplate::fromId($shiftId, $lunchBreakSeconds);
     }
 }

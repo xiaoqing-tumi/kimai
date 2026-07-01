@@ -9,6 +9,7 @@
 
 namespace App\Tests\Command;
 
+use App\Attendance\DemoAttendanceGenerator;
 use App\Command\SeedAttendanceCommand;
 use App\Repository\AttendanceRecordRepository;
 use App\Repository\UserRepository;
@@ -28,6 +29,7 @@ class SeedAttendanceCommandTest extends KernelTestCase
             $this->createMock(UserRepository::class),
             $this->createMock(AttendanceRecordRepository::class),
             $this->createMock(EntityManagerInterface::class),
+            new DemoAttendanceGenerator(),
         ));
 
         self::assertTrue($application->has('kimai:seed:attendance'));

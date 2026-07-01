@@ -98,6 +98,7 @@ final class QuickEntryForm extends AbstractType
                 // the validation still triggers if the user selects days outside the project range.
                 'start_date' => $options['end_date'],
                 'end_date' => $options['end_date'],
+                'locked' => $options['locked'],
                 'empty_data' => function (FormInterface $form) use ($options) {
                     if ($options['prototype_data'] instanceof QuickEntryModel) {
                         return clone $options['prototype_data'];
@@ -107,7 +108,7 @@ final class QuickEntryForm extends AbstractType
                 'prototype_data' => clone $options['prototype_data'],
             ],
             'prototype_data' => $options['prototype_data'],
-            'allow_add' => true,
+            'allow_add' => !$options['locked'],
             'constraints' => [
                 new Valid(),
                 new All(['constraints' => [new QuickEntryModel()]])
@@ -152,6 +153,7 @@ final class QuickEntryForm extends AbstractType
             'start_date' => $start,
             'end_date' => $end,
             'prototype_data' => null,
+            'locked' => false,
         ]);
     }
 }
